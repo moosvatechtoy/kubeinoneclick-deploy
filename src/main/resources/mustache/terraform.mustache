@@ -1,0 +1,24 @@
+set -e
+
+echo 'using image {{terraformImage}}'
+
+echo 'cloning {{gitRepositoryUrl}}' | awk '{ sub(/oauth2:(.*)@/, "oauth2:[MASKED]@");}1'
+git clone {{gitRepositoryUrl}} module
+
+cd module
+{{#gitDirectory}}
+    cd {{gitDirectory}}
+{{/gitDirectory}}
+
+echo 'generating backend configuration'
+echo 'terraform {
+    backend "http" {
+        address = "{{externalUrl}}/api/state/{{stackId}}"
+        username = "{{stateApiUser}}"
+        password = "{{stateApiPassword}}"
+    }
+}' > backend.tf
+
+terraform version
+terraform init
+{{&command}}
