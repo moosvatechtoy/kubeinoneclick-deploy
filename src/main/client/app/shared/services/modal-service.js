@@ -2,7 +2,7 @@ export const displayNotification = (vueContext, options) => {
   vueContext.$bvToast.toast(options.message, {
     solid: true,
     toaster: 'b-toaster-top-center',
-    title: options.title ? `Gaia - ${options.title}` : 'Gaia',
+    title: options.title ? `OneClick - ${options.title}` : 'OneClick',
     variant: options.variant,
   });
 };

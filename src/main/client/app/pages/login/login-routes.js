@@ -7,7 +7,7 @@ const loginRoutes = [
     component: AppLoginForm,
     meta: {
       layout: 'none',
-      title: 'Gaia - A terraform UI - Login',
+      title: 'OneClick - A terraform UI - Login',
     },
   },
 ];

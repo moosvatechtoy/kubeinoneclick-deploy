@@ -8,7 +8,7 @@ const dashboardRoutes = [
     meta: {
       authorities: ['ROLE_USER'],
       breadcrumb: [{ text: 'Dashboard' }],
-      title: 'Gaia - Dashboard',
+      title: 'OneClick - Dashboard',
     },
   },
 ];

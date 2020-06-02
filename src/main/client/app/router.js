@@ -22,7 +22,7 @@ const appRoutes = [
     path: '/',
     name: 'home',
     redirect: '/dashboard',
-    meta: { title: 'Gaia - A terraform UI' },
+    meta: { title: 'OneClick - A terraform UI' },
   },
   {
     path: '/not-found',
