@@ -11,7 +11,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.StringWriter;
 import java.nio.ByteBuffer;
 import java.nio.channels.Channels;
 import java.nio.channels.WritableByteChannel;
@@ -48,53 +51,84 @@ public class DockerRunner {
             env.addAll(settings.env());
 
             var job = jobWorkflow.getJob();
-
-            // FIXME This is certainly no thread safe !
-            var containerConfig = containerConfigBuilder
-                    .env(env)
-                    .image(job.getTerraformImage().image())
-                    .build();
-
-            // pull the image
-            dockerClient.pull(containerConfig.image());
-
-            var containerCreation = dockerClient.createContainer(containerConfig);
-            var containerId = containerCreation.id();
-
-            var dockerContainer = new DockerContainer(containerId, dockerClient, httpHijackWorkaround);
-
-            dockerClient.startContainer(containerId);
-
-            // attaching the outputs in a background thread
             var step = jobWorkflow.getCurrentStep();
-            CompletableFuture.runAsync(() -> {
-                try (var writerOutputStream = new WriterOutputStream(step.getLogsWriter(), Charset.defaultCharset())) {
-                    // this code is blocking I/O !
-                    dockerContainer.attach(writerOutputStream, writerOutputStream);
-                } catch (IOException | StackRunnerException e) {
-                    LOG.error("Unable to attach logs of container", e);
-                }
-            });
+            step.getLogsWriter().append(runTerraformCommand(script).toString());
+            // FIXME This is certainly no thread safe !
+			/*
+			 * var containerConfig = containerConfigBuilder .env(env)
+			 * .image(job.getTerraformImage().image()) .build();
+			 * 
+			 * // pull the image dockerClient.pull(containerConfig.image());
+			 * 
+			 * var containerCreation = dockerClient.createContainer(containerConfig); var
+			 * containerId = containerCreation.id();
+			 * 
+			 * var dockerContainer = new DockerContainer(containerId, dockerClient,
+			 * httpHijackWorkaround);
+			 * 
+			 * dockerClient.startContainer(containerId);
+			 * 
+			 * // attaching the outputs in a background thread var step =
+			 * jobWorkflow.getCurrentStep(); CompletableFuture.runAsync(() -> { try (var
+			 * writerOutputStream = new WriterOutputStream(step.getLogsWriter(),
+			 * Charset.defaultCharset())) { // this code is blocking I/O !
+			 * dockerContainer.attach(writerOutputStream, writerOutputStream); } catch
+			 * (IOException | StackRunnerException e) {
+			 * LOG.error("Unable to attach logs of container", e); } });
+			 * 
+			 * // write the content of the script to the container's std in try
+			 * (WritableByteChannel stdIn = Channels.newChannel(dockerContainer.getStdIn()))
+			 * { stdIn.write(ByteBuffer.wrap(script.getBytes())); }
+			 * 
+			 * // wait for the container to exit var containerExit =
+			 * dockerClient.waitContainer(containerCreation.id());
+			 * 
+			 * dockerClient.removeContainer(containerCreation.id());
+			 */
 
-            // write the content of the script to the container's std in
-            try (WritableByteChannel stdIn = Channels.newChannel(dockerContainer.getStdIn())) {
-                stdIn.write(ByteBuffer.wrap(script.getBytes()));
-            }
-
-            // wait for the container to exit
-            var containerExit = dockerClient.waitContainer(containerCreation.id());
-
-            dockerClient.removeContainer(containerCreation.id());
-
-            return Math.toIntExact(containerExit.statusCode());
-        } catch (InterruptedException e) {
+//            return Math.toIntExact(containerExit.statusCode());
+            return 0;
+        } catch (RuntimeException | IOException e) {
             Thread.currentThread().interrupt();
             LOG.error("Interrupted Exception", e);
             return 99;
-        } catch (DockerException | IOException | StackRunnerException e) {
-            LOG.error("Exception when running job", e);
-            return 99;
-        }
+        } 
+		/*
+		 * catch (DockerException | IOException | StackRunnerException e) {
+		 * LOG.error("Exception when running job", e); return 99; }
+		 */
+    }
+    
+    private StringWriter runTerraformCommand(String command) {
+    	LOG.error("Rnning job command from shell command runnwer==>" + command);
+    	StringWriter stringWriter = new StringWriter();
+    	try {
+    		ProcessBuilder processBuilder = new ProcessBuilder();
+        	processBuilder.command("bash", "-c", command);
+		    Process process = processBuilder.start();
+		
+		    BufferedReader reader = new BufferedReader(
+		            new InputStreamReader(process.getInputStream()));
+		    String line;
+		    while ((line = reader.readLine()) != null) {
+		    	stringWriter.append(line + '\n');
+		    }
+		    BufferedReader errorReader = new BufferedReader(
+		            new InputStreamReader(process.getErrorStream()));
+		    while ((line = errorReader.readLine()) != null) {
+		    	stringWriter.append(line + '\n');
+		    }
+		     
+		    errorReader.close();
+		    reader.close();
+		    
+		    process.waitFor();
+		    System.out.println(stringWriter.toString());
+		 
+		} catch (IOException | InterruptedException e) {
+		    e.printStackTrace();
+		}
+    	return stringWriter;
     }
 
 }
