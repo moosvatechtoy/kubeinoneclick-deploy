@@ -15,7 +15,7 @@ class LoginPage(val webDriver: WebDriver) {
 
     init {
         val wait = WebDriverWait(webDriver, 10)
-        wait.until { titleIs("Gaia - A terraform UI - Login") }
+        wait.until { titleIs("OneClick - THE UI - Login") }
     }
 
     @FindBy(name="username")
@@ -34,7 +34,7 @@ class LoginPage(val webDriver: WebDriver) {
 
         // wait for successful login
         val wait = WebDriverWait(webDriver, 10)
-        wait.until { titleIs("Gaia - A terraform UI").andThen { elementToBeClickable(By.id("user.name")) } }
+        wait.until { titleIs("OneClick - THE UI").andThen { elementToBeClickable(By.id("user.name")) } }
 
         assertEquals("admin", webDriver.findElement(By.id("user.name")).text);
     }

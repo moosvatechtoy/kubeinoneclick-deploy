@@ -18,7 +18,7 @@ class DashboardPage (val webDriver: WebDriver){
 
     fun waitForPageLoaded() {
         val wait = WebDriverWait(webDriver, 10)
-        wait.until(ExpectedConditions.titleIs("Gaia - Dashboard"))
+        wait.until(ExpectedConditions.titleIs("OneClick - Dashboard"))
         wait.until(ExpectedConditions.numberOfElementsToBe(By.className("b-overlay"), 0))
 
         // getting widget values

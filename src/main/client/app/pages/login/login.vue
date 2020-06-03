@@ -3,7 +3,7 @@
     <div class="wrap-login">
       <div class="login-pic">
         <img
-          src="https://13zmfmnuenq8wqpf1ttwov16-wpengine.netdna-ssl.com/wp-content/uploads/2019/12/PK-Red.png"
+          src="@/assets/images/gaia.png"
           alt="gaia-logo"
         >
       </div>
@@ -14,7 +14,7 @@
         @submit.prevent="doLogin"
       >
         <h1 class="login-form-title">
-          OnClick - Login
+          OneClick - Login
         </h1>
 
         <div>
