@@ -37,7 +37,7 @@
       </b-card>
 
       <template v-slot:footer>
-        <em>Import an existing module code from existing {{ registry }} repository</em>
+        <em>Import an existing profile code from existing {{ registry }} repository</em>
       </template>
     </b-card>
   </div>
@@ -85,7 +85,7 @@
       },
       async importRepository() {
         this.isImporting = true;
-        displayNotification(this, { message: 'Importing module from repository', variant: 'info' });
+        displayNotification(this, { message: 'Importing profile from repository', variant: 'info' });
         const id = this.selectedRepository.id ? this.selectedRepository.id : this.selectedRepository.fullName;
         const module = await importRegistryRepository(this.registry, id);
         this.$router.push({ name: 'module', params: { moduleId: module.id } });

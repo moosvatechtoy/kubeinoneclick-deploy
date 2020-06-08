@@ -13,7 +13,7 @@
       <b-card v-if="selected === 'manual'">
         <b-card-text>
           <b-form-group
-            label="Enter the module name"
+            label="Enter the profile name"
             label-for="module-name"
           >
             <b-form-input
@@ -35,7 +35,7 @@
       </b-card>
 
       <template v-slot:footer>
-        <em>Import a module manually (only for users with superpowers)</em>
+        <em>Import a profile manually (only for users with superpowers)</em>
       </template>
     </b-card>
   </div>
@@ -63,7 +63,7 @@
           name: this.moduleName,
         };
         module = await createModule(module);
-        this.$router.push({ name: 'module', params: { id: module.id } });
+        this.$router.push({ name: 'modules', params: { moduleId: module.id } });
       },
     },
   };

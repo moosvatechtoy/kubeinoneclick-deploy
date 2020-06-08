@@ -5,7 +5,7 @@
         <b-overlay :show="loading">
           <app-dashboard-widget
             class="blue2_bg"
-            text="Modules"
+            text="Templates"
             :value="summary.modulesCount"
             icon="object-group"
             :to="{ name: 'modules' }"
@@ -16,7 +16,7 @@
         <b-overlay :show="loading">
           <app-dashboard-widget
             class="blue2_bg"
-            text="Running Stacks"
+            text="Running Provisioners"
             :value="summary.runningStacksCount"
             icon="layer-group"
             :to="{ name : 'stacks' }"
@@ -27,7 +27,7 @@
         <b-overlay :show="loading">
           <app-dashboard-widget
             class="yellow_bg"
-            text="Stacks to update"
+            text="Provisioners to update"
             :value="summary.toUpdateStacksCount"
             icon="caret-square-up"
             :to="{ name : 'stacks' }"

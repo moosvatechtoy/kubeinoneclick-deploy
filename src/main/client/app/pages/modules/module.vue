@@ -1,26 +1,28 @@
 <template>
-  <div
-    v-if="module"
-    class="block"
-  >
+  <div v-if="module" class="block">
     <div class="block_head">
-      <h2>Module {{ module.name }}</h2>
+      <h2>Template {{ module.name }}</h2>
     </div>
 
     <div class="block_content">
       <form>
         <b-form-row>
           <b-col>
-            <b-form-group
-              label="Name"
-              description="The name of your module"
-            >
-              <b-input
-                id="module.name"
-                v-model="module.name"
-                :state="notEmpty(module.name)"
-              />
+            <b-form-group label="Name" description="The name of your Template">
+              <b-input id="module.name" v-model="module.name" :state="notEmpty(module.name)" />
               <b-form-invalid-feedback>This field is mandatory</b-form-invalid-feedback>
+            </b-form-group>
+          </b-col>
+          <b-col cols="4">
+            <b-form-group label="Provider">
+            <vue-multiselect
+              v-model="module.mainProvider"
+              searchable
+              placeholder="Select Provider"
+              :show-labels="false"
+              :options="['AWS','AZURE', 'GOOGLE', 'ONPREM']"
+            />
+            <b-form-invalid-feedback>This field is mandatory</b-form-invalid-feedback>
             </b-form-group>
           </b-col>
           <b-col :md="isTerraformImageOverride ? '5' : '3'">
@@ -32,17 +34,11 @@
           </b-col>
         </b-form-row>
 
-        <b-form-group
-          label="Description"
-          description="The description of your module"
-        >
-          <b-input
-            id="module.description"
-            v-model="module.description"
-          />
+        <b-form-group label="Description" description="The description of your Template">
+          <b-form-textarea v-model="module.description" />
         </b-form-group>
 
-        <b-form-row>
+        <!-- <b-form-row>
           <b-col cols="3">
             <b-form-group label="Estimated monthly cost">
               <b-input-group append="$">
@@ -59,13 +55,13 @@
             </b-input-group-text>
             <b-form-textarea v-model="module.estimatedMonthlyCostDescription" />
           </b-input-group>
-        </b-form-group>
+        </b-form-group>-->
 
         <b-form-row>
           <b-col>
             <b-form-group
               label="Git Repository URL"
-              description="The URL of the module's git repository"
+              description="The URL of the Template's git repository"
             >
               <b-input
                 v-model="module.gitRepositoryUrl"
@@ -77,7 +73,7 @@
           <b-col>
             <b-form-group
               label="Git repository directory"
-              description="The sub-directory of the module's code inside the repository (leave empty if root)"
+              description="The sub-directory of the Template's code inside the repository (leave empty if root)"
             >
               <b-input v-model="module.directory" />
             </b-form-group>
@@ -104,10 +100,7 @@
 
         <h2>
           Variables
-          <b-button
-            variant="success"
-            @click="addVar()"
-          >
+          <b-button variant="success" @click="addVar()">
             <font-awesome-icon icon="plus" />
           </b-button>
         </h2>
@@ -119,12 +112,8 @@
           @removeVar="removeVar"
         />
 
-        <b-button
-          variant="primary"
-          :disabled="!formValid"
-          @click="save"
-        >
-          <font-awesome-icon icon="save" /> Save
+        <b-button variant="primary" :disabled="!formValid" @click="save">
+          <font-awesome-icon icon="save" />Save
         </b-button>
       </form>
     </div>
@@ -132,67 +121,130 @@
 </template>
 
 <script>
-  import AppModuleVariable from '@/pages/modules/module-variable.vue';
-  import AppTerraformImageInput from '@/pages/modules/terraform-image-input.vue';
-  import {
-    getModule,
-    updateModule,
-  } from '@/shared/api/modules-api';
-  import { getTeams } from '@/shared/api/teams-api';
-  import { displayNotification } from '@/shared/services/modal-service';
+import AppModuleVariable from "@/pages/modules/module-variable.vue";
+import AppTerraformImageInput from "@/pages/modules/terraform-image-input.vue";
+import {
+  getModule,
+  updateModule,
+  createModule
+} from "@/shared/api/modules-api";
+import { getTeams } from "@/shared/api/teams-api";
+import { displayNotification } from "@/shared/services/modal-service";
 
-  export default {
-    name: 'AppModule',
+export default {
+  name: "AppModule",
 
-    components: {
-      AppModuleVariable,
-      AppTerraformImageInput,
-    },
+  components: {
+    AppModuleVariable,
+    AppTerraformImageInput
+  },
 
-    props: {
-      moduleId: {
-        type: String,
-        required: true,
-      },
-    },
+  props: {
+    moduleId: {
+      type: String,
+      required: true
+    }
+  },
 
-    data: function data() {
-      return {
-        module: null,
-        isTerraformImageValid: null,
-        isTerraformImageOverride: null,
-        teams: [],
+  data: function data() {
+    return {
+      module: null,
+      isTerraformImageValid: null,
+      isTerraformImageOverride: null,
+      teams: []
+    };
+  },
+
+  computed: {
+    formValid() {
+      return (
+        [this.module.name, this.module.mainProvider, this.module.gitRepositoryUrl].every(this.notEmpty) &&
+        this.module.variables
+          .map(variable => variable.name)
+          .every(this.notEmpty) &&
+        this.isTerraformImageValid
+      );
+    }
+  },
+
+  async created() {
+    console.log(this.moduleId);
+    if (this.moduleId === "ADD") {
+      this.module = {};
+      this.module.moduleMetadata = {};
+      this.module.terraformImage = {
+        repository: "hashicorp/terraform",
+        tag: "latest"
       };
-    },
-
-    computed: {
-      formValid() {
-        return [this.module.name, this.module.gitRepositoryUrl].every(this.notEmpty)
-          && this.module.variables.map((variable) => variable.name).every(this.notEmpty)
-          && this.isTerraformImageValid;
-      },
-    },
-
-    async created() {
+      this.module.variables = [
+        { name: "aws_region_name", editable: true },
+        { name: "cluster-name", defaultValue: "", editable: true },
+        { name: "desired_size", defaultValue: "", editable: true },
+        { name: "instance_types", defaultValue: "", editable: true },
+        { name: "max_size", defaultValue: "", editable: true },
+        { name: "min_size", defaultValue: "", editable: true },
+        { name: "vpc_cidr_block", defaultValue: "", editable: true },
+        { name: "vpc_subnet", defaultValue: "", editable: true }
+      ];
+      this.module.moduleMetadata = {};
+      this.isCreate = true;
+    } else {
       this.module = await getModule(this.moduleId);
-      this.teams = await getTeams();
-    },
+      this.isCreate = false;
+    }
+    this.teams = await getTeams();
+  },
 
-    methods: {
-      notEmpty(field) {
-        return typeof field !== 'undefined' && field !== null && field.trim() !== '';
-      },
-      async save() {
-        await updateModule(this.module)
-          .then(() => displayNotification(this, { message: 'Module saved', variant: 'success' }))
-          .catch(({ error, message }) => displayNotification(this, { title: error, message, variant: 'danger' }));
-      },
-      removeVar(variable) {
-        this.module.variables.splice(this.module.variables.findIndex((v) => v.name === variable.name), 1);
-      },
-      addVar() {
-        this.module.variables.push({});
-      },
+  methods: {
+    notEmpty(field) {
+      return (
+        typeof field !== "undefined" && field !== null && field.trim() !== ""
+      );
     },
-  };
+    async save() {
+      if (this.isCreate) {
+        await createModule(this.module)
+          .then(() => {
+            displayNotification(this, {
+              message: "Template created",
+              variant: "success"
+            });
+            this.$router.push({ name: "modules", params: {} });
+          })
+          .catch(({ error, message }) =>
+            displayNotification(this, {
+              title: error,
+              message,
+              variant: "danger"
+            })
+          );
+      } else {
+        await updateModule(this.module)
+          .then(() => {
+            displayNotification(this, {
+              message: "Template saved",
+              variant: "success"
+            });
+            this.$router.push({ name: "modules", params: {} });
+          })
+          .catch(({ error, message }) =>
+            displayNotification(this, {
+              title: error,
+              message,
+              variant: "danger"
+            })
+          );
+      }
+    },
+    removeVar(variable) {
+      this.module.variables.splice(
+        this.module.variables.findIndex(v => v.name === variable.name),
+        1
+      );
+    },
+    addVar() {
+      this.module.variables.push({});
+    }
+  }
+};
 </script>

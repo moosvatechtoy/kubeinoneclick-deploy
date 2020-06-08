@@ -42,7 +42,7 @@
       <div class="col-md-6">
         <div class="block">
           <div class="block_head">
-            <h2>Stack {{ stack.name }}</h2>
+            <h2>Provisioner {{ stack.name }}</h2>
             <small>{{ stack.description }}</small>
             <div class="metadata">
               <p>
@@ -64,7 +64,7 @@
                 variant="success"
                 pill
                 data-toggle="tooltip"
-                title="Your stack is new and has not been started yet."
+                title="Your Provisioner is new and has not been started yet."
               >
                 <i class="fas fa-star-of-life" /> new
               </b-badge>
@@ -73,7 +73,7 @@
                 variant="primary"
                 pill
                 data-toggle="tooltip"
-                title="Your stack is up and running !"
+                title="Your Provisioner is up and running !"
               >
                 <i class="far fa-check-square" /> running
               </b-badge>
@@ -82,7 +82,7 @@
                 variant="warning"
                 pill
                 data-toggle="tooltip"
-                title="Your stack needs an update !"
+                title="Your Provisioner needs an update !"
               >
                 <i class="fas fa-upload" /> to update
               </b-badge>
@@ -91,7 +91,7 @@
                 variant="danger"
                 pill
                 data-toggle="tooltip"
-                title="Your stack has been stopped."
+                title="Your Provisioner has been stopped."
               >
                 <i class="fas fa-stop-circle" /> stopped
               </b-badge>
@@ -110,7 +110,7 @@
                 This field is mandatory.
               </b-form-invalid-feedback>
               <b-form-text id="input-live-help">
-                This is the name of your stack.
+                This is the name of your Provisioner.
               </b-form-text>
             </b-form-group>
             <b-form-invalid-feedback id="input-live-feedback">
@@ -136,8 +136,8 @@
       <div class="col-md-6">
         <div class="block">
           <div class="block_head">
-            <h2>Module variables values</h2>
-            <small>This is the configuration of your module's variables !</small>
+            <h2>Variable values</h2>
+            <small>This is the configuration of your profile's variables !</small>
           </div>
           <div
             v-if="stack.variables"
@@ -248,9 +248,9 @@
           this.stack.variableValues[variable.name] = variable.value;
         });
         saveStack(this.stack)
-          .then(() => displayNotification(this, { variant: 'success', message: 'Stack saved.' }))
+          .then(() => displayNotification(this, { variant: 'success', message: 'Provisioner saved.' }))
           .catch(({ message }) => {
-            displayNotification(this, { variant: 'info', message: `Error saving stack: ${message}` });
+            displayNotification(this, { variant: 'info', message: `Error saving Provisioner: ${message}` });
           });
       },
       async runStack() {

@@ -1,21 +1,30 @@
 <template>
   <div>
-    <b-button
-      :to="{ name: 'module_import' }"
-      title="Import Module"
-      variant="success"
-      class="mb-4"
-    >
-      <font-awesome-icon icon="save" /> Import Module
-    </b-button>
+    <b-form-row>
+      <b-col cols="10">
+        <b-button
+          :to="{ name: 'module', params: { moduleId: 'ADD' }}"
+          title="Add Template"
+          variant="success"
+          class="mb-4"
+        >
+          <font-awesome-icon icon="plus" />Add Template
+        </b-button>
+      </b-col>
+      <b-col cols="2">
+        <vue-multiselect
+          v-model="provider"
+          searchable
+          placeholder="Select Provider"
+          :show-labels="false"
+          :options="['', 'AWS','AZURE', 'GOOGLE', 'ONPREM']"
+          @select="onProviderSelect"
+        />
+      </b-col>
+    </b-form-row>
 
     <b-card-group columns>
-      <b-card
-        v-for="module in modules"
-        :key="module.id"
-        :title="module.name"
-        class="moduleCard"
-      >
+      <b-card v-for="module in filteredModules" :key="module.id" :title="module.name" class="moduleCard">
         <b-card-text>
           <app-cli-badge
             :cli="module.terraformImage"
@@ -24,17 +33,15 @@
           />
           <p>{{ module.description }}</p>
 
-          <p v-if="module.estimatedMonthlyCost">
+          <!-- <p v-if="module.estimatedMonthlyCost">
             Estimated monthly cost :
-            <b-badge variant="info">
-              {{ module.estimatedMonthlyCost }} $
-            </b-badge>
-          </p>
+            <b-badge variant="info">{{ module.estimatedMonthlyCost }} $</b-badge>
+          </p> -->
         </b-card-text>
 
         <b-button
           :to="{ name: 'module', params: { moduleId: module.id }}"
-          title="Edit this module"
+          title="Edit this Template"
           variant="primary"
           class="mr-1"
         >
@@ -43,7 +50,7 @@
 
         <b-button
           :to="{ name: 'module_description', params: { moduleId: module.id }}"
-          title="Detail of this module"
+          title="Detail of this Template"
           variant="primary"
           class="mr-1"
         >
@@ -51,12 +58,21 @@
         </b-button>
 
         <b-button
-          title="Run this module"
+          title="Run this Template"
           variant="primary"
           class="mr-1"
           @click="createStack(module.id)"
         >
           <font-awesome-icon icon="rocket" />
+        </b-button>
+
+        <b-button
+          title="Delete this Template"
+          variant="danger"
+          class="mr-1"
+          @click="createStack(module.id)"
+        >
+          <font-awesome-icon :icon="['far', 'trash-alt']" />
         </b-button>
       </b-card>
     </b-card-group>
@@ -64,37 +80,45 @@
 </template>
 
 <script>
-  import { getModules } from '@/shared/api/modules-api';
+import { getModules } from "@/shared/api/modules-api";
 
-  import { AppCliBadge } from '@/shared/components';
+import { AppCliBadge } from "@/shared/components";
 
-  export default {
-    name: 'AppModules',
+export default {
+  name: "AppModules",
+  components: {
+    AppCliBadge
+  },
 
-    components: {
-      AppCliBadge,
+  data: function data() {
+    return {
+      filteredModules: [],
+      modules: [],
+      provider: "AWS"
+    };
+  },
+
+  async created() {
+    this.modules = await getModules();
+    this.filteredModules = this.modules.filter(item => item.mainProvider === 'AWS');
+  },
+
+  methods: {
+    createStack(moduleId) {
+      this.$router.push({
+        name: "stack_creation",
+        params: {
+          moduleId
+        }
+      });
     },
-
-    data: function data() {
-      return {
-        modules: [],
-      };
-    },
-
-    async created() {
-      this.modules = await getModules();
-    },
-
-    methods: {
-      createStack(moduleId) {
-        this.$router.push({
-          name: 'stack_creation',
-          params: {
-            moduleId,
-          },
-        });
-      },
-    },
-
-  };
+    onProviderSelect(provider) {
+      if (provider !== '') {
+        this.filteredModules = this.modules.filter(item => item.mainProvider === provider);
+      } else {
+        this.filteredModules = this.modules;
+      }
+    }
+  }
+};
 </script>

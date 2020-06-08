@@ -4,7 +4,7 @@
     class="block"
   >
     <div class="block_head_flex">
-      <h2>Stack {{ stack.name }}</h2>
+      <h2>Provisioner {{ stack.name }}</h2>
       <app-cli-badge
         :cli="job.terraformImage"
         badge-style="for-the-badge"

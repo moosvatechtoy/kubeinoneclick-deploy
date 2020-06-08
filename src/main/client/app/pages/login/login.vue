@@ -3,7 +3,7 @@
     <div class="wrap-login">
       <div class="login-pic">
         <img
-          src="@/assets/images/gaia.png"
+          src="https://13zmfmnuenq8wqpf1ttwov16-wpengine.netdna-ssl.com/wp-content/uploads/2019/12/PK-Red.png"
           alt="gaia-logo"
         >
       </div>
@@ -109,7 +109,7 @@
     align-items: center;
     padding: 15px;
     background: white;
-    background: linear-gradient(-135deg, #baeb6c, #fff);
+    background: linear-gradient(-135deg, #C70001, #fff);
   }
 
   .wrap-login {
@@ -199,7 +199,7 @@
   }
 
   .input:focus + .focus-input + .symbol-input {
-    color: #57b846;
+    color: #C70001;
     padding-left: 28px;
   }
 
@@ -223,7 +223,7 @@
   }
 
   .login-form-btn:hover {
-    background: #57b846;
+    background: #C70001;
   }
 
   @media (max-width: 992px) {

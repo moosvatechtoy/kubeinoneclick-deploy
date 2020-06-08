@@ -17,6 +17,11 @@
         {{ text }}
       </p>
     </div>
+    <div class="widget-info">
+      <p class="widget-value">
+      AWS : 12 AZURE : 3 GOOGLE : 1 ONPREM : 0
+      </p>
+    </div>
   </router-link>
 </template>
 
@@ -64,6 +69,14 @@
     justify-content: space-around;
   }
 
+  .widget-info {
+    padding: 12px 0 0 0;
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+  }
+
   .widget-detail .widget-value {
     margin: 0;
     line-height: normal;
@@ -72,6 +85,16 @@
     font-weight: 400;
     color: #fff;
   }
+
+  .widget-info .widget-value {
+    margin: 0;
+    line-height: normal;
+    text-align: right;
+    font-size: 14px;
+    font-weight: 400;
+    color: #fff;
+  }
+  
 
   .widget-detail .widget-text {
     margin: 0;

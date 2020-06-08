@@ -6,7 +6,7 @@
     <b-navbar-brand :to="{ name: 'home' }">
       <img
         class="img-responsive logo"
-        src="@/assets/images/gaia_logo_with_title_right.png"
+        src="https://13zmfmnuenq8wqpf1ttwov16-wpengine.netdna-ssl.com/wp-content/uploads/2019/12/PK-Red.png"
         alt="#"
       >
     </b-navbar-brand>
@@ -39,7 +39,7 @@
   }
 
   .logo {
-    height: 42px;
+    height: 50px;
     margin: 0 15px;
   }
 </style>

@@ -4,13 +4,13 @@
     class="block"
   >
     <form-wizard
-      title="Run a new stack"
-      subtitle="Follow the steps to start a new stack"
+      title="Run a new Provisioner"
+      subtitle="Follow the steps to start a new Provisioner"
       color="#00ab94"
       error-color="#dc3545"
     >
       <tab-content
-        title="Stack"
+        title="Provisioner"
         :before-change="checkStackNameValidation"
       >
         <h4>{{ module.name }}</h4>
@@ -21,7 +21,7 @@
         <div class="form-group">
           <b-form-group
             label="Name"
-            description="The name of your stack"
+            description="The name of your Provisioner"
           >
             <b-input
               v-model="stack.name"
@@ -32,7 +32,7 @@
           </b-form-group>
           <b-form-group
             label="Description"
-            description="The description of your stack"
+            description="The description of your Provisioner"
           >
             <b-input v-model="stack.description" />
           </b-form-group>

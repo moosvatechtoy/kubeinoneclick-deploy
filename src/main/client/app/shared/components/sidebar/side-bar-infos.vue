@@ -4,21 +4,21 @@
       v-if="buildInfo.version"
       class="build-info"
     >
-      <font-awesome-icon
+      <!-- <font-awesome-icon
         icon="tag"
         class="icon"
       />
-      <span>{{ buildInfo.version }}</span>
+      <span>{{ buildInfo.version }}</span> -->
     </span>
     <span
       v-if="buildInfo.commitId"
       class="build-info build-commit"
     >
-      <font-awesome-icon
+      <!-- <font-awesome-icon
         :icon="['fab', 'github']"
         class="icon"
       />
-      <span>{{ buildInfo.commitId }}</span>
+      <span>{{ buildInfo.commitId }}</span> -->
     </span>
   </div>
 </template>

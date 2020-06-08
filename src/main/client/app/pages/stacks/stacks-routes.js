@@ -5,8 +5,8 @@ const stacksRoutes = [
     component: () => import(/* webpackChunkName: "chunk-stacks" */ '@/pages/stacks/stacks.vue'),
     meta: {
       authorities: ['ROLE_USER'],
-      breadcrumb: [{ text: 'Stacks' }],
-      title: 'OneClick - Stacks',
+      breadcrumb: [{ text: 'Provisioners' }],
+      title: 'OneClick - Provisioners',
     },
   },
   {
@@ -16,8 +16,8 @@ const stacksRoutes = [
     props: true,
     meta: {
       authorities: ['ROLE_USER'],
-      breadcrumb: [{ text: 'Stacks', to: { name: 'stacks' } }, { text: 'Stack creation' }],
-      title: 'OneClick - Stack creation',
+      breadcrumb: [{ text: 'Provisioners', to: { name: 'stacks' } }, { text: 'Provisioner creation' }],
+      title: 'OneClick - Provisioner creation',
     },
   },
   {
@@ -34,8 +34,8 @@ const stacksRoutes = [
         component: () => import(/* webpackChunkName: "chunk-stacks" */ '@/pages/stacks/stack-edition.vue'),
         meta: {
           authorities: ['ROLE_USER'],
-          breadcrumb: [{ text: 'Stacks', to: { name: 'stacks' } }, { text: 'Stack edition' }],
-          title: 'OneClick - Stack edition',
+          breadcrumb: [{ text: 'Provisioners', to: { name: 'stacks' } }, { text: 'Provisioner edition' }],
+          title: 'OneClick - Provisioner edition',
         },
       },
       {
@@ -46,11 +46,11 @@ const stacksRoutes = [
         meta: {
           authorities: ['ROLE_USER'],
           breadcrumb: [
-            { text: 'Stacks', to: { name: 'stacks' } },
-            { text: 'Stack', to: { name: 'stack_edition' } },
+            { text: 'Provisioners', to: { name: 'stacks' } },
+            { text: 'Provisioner', to: { name: 'stack_edition' } },
             { text: 'Job' },
           ],
-          title: 'OneClick - Stack job',
+          title: 'OneClick - Provisioner job',
         },
       },
     ],
