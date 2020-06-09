@@ -1,32 +1,31 @@
 <template>
   <div v-if="module" class="block">
     <div class="block_head">
-      <h2>Template {{ module.name }}</h2>
+      <h2>Configuration {{ module.name }}</h2>
     </div>
 
     <div class="block_content">
       <form>
         <b-form-row>
           <b-col>
-            <b-form-group label="Name" description="The name of your Template">
+            <b-form-group label="Name" description="The name of your Configuration">
               <b-input id="module.name" v-model="module.name" :state="notEmpty(module.name)" />
               <b-form-invalid-feedback>This field is mandatory</b-form-invalid-feedback>
             </b-form-group>
           </b-col>
-          <b-col cols="4">
-            <b-form-group label="Provider">
-            <vue-multiselect
-              v-model="module.mainProvider"
-              searchable
-              placeholder="Select Provider"
-              :show-labels="false"
-              :options="['AWS','AZURE', 'GOOGLE', 'ONPREM']"
-            />
-            <b-form-invalid-feedback>This field is mandatory</b-form-invalid-feedback>
+          <b-col cols="2">
+            <b-form-checkbox style="margin-top: 30px;" v-model="module.remoteRun" name="remoteRun-button" switch>
+                Container
+              </b-form-checkbox>
+          </b-col>
+          <b-col cols="4"  v-if="!module.remoteRun">
+            <b-form-group label="Terraform Path" description="Terraform installed location">
+              <b-input id="module.terraformPath" v-model="module.terraformPath" :state="notEmpty(module.terraformPath)" />
+              <b-form-invalid-feedback>Terraform Location is mandatory</b-form-invalid-feedback>
             </b-form-group>
           </b-col>
           <b-col :md="isTerraformImageOverride ? '5' : '3'">
-            <app-terraform-image-input
+            <app-terraform-image-input v-if="module.remoteRun"
               :image="module.terraformImage"
               @form-status="isTerraformImageValid = $event"
               @override-status="isTerraformImageOverride = $event"
@@ -34,34 +33,15 @@
           </b-col>
         </b-form-row>
 
-        <b-form-group label="Description" description="The description of your Template">
+        <b-form-group label="Description" description="The description of your Configuration">
           <b-form-textarea v-model="module.description" />
         </b-form-group>
-
-        <!-- <b-form-row>
-          <b-col cols="3">
-            <b-form-group label="Estimated monthly cost">
-              <b-input-group append="$">
-                <b-form-input v-model="module.estimatedMonthlyCost" />
-              </b-input-group>
-            </b-form-group>
-          </b-col>
-        </b-form-row>
-
-        <b-form-group label="Description of estimated monthly cost">
-          <b-input-group>
-            <b-input-group-text slot="append">
-              <font-awesome-icon :icon="['fab', 'markdown']" />
-            </b-input-group-text>
-            <b-form-textarea v-model="module.estimatedMonthlyCostDescription" />
-          </b-input-group>
-        </b-form-group>-->
 
         <b-form-row>
           <b-col>
             <b-form-group
               label="Git Repository URL"
-              description="The URL of the Template's git repository"
+              description="The URL of the Configuration's git repository"
             >
               <b-input
                 v-model="module.gitRepositoryUrl"
@@ -73,7 +53,7 @@
           <b-col>
             <b-form-group
               label="Git repository directory"
-              description="The sub-directory of the Template's code inside the repository (leave empty if root)"
+              description="The sub-directory of the Configuration's code inside the repository (leave empty if root)"
             >
               <b-input v-model="module.directory" />
             </b-form-group>
@@ -158,7 +138,11 @@ export default {
   computed: {
     formValid() {
       return (
-        [this.module.name, this.module.mainProvider, this.module.gitRepositoryUrl].every(this.notEmpty) &&
+        [
+          this.module.name,
+          this.module.mainProvider,
+          this.module.gitRepositoryUrl
+        ].every(this.notEmpty) &&
         this.module.variables
           .map(variable => variable.name)
           .every(this.notEmpty) &&
@@ -172,6 +156,8 @@ export default {
     if (this.moduleId === "ADD") {
       this.module = {};
       this.module.moduleMetadata = {};
+      this.module.remoteRun = true;
+      this.module.terraformPath = '/usr/local/terraform'
       this.module.terraformImage = {
         repository: "hashicorp/terraform",
         tag: "latest"
@@ -202,11 +188,12 @@ export default {
       );
     },
     async save() {
+      this.module.mainProvider = this.module.name;
       if (this.isCreate) {
         await createModule(this.module)
           .then(() => {
             displayNotification(this, {
-              message: "Template created",
+              message: "Configuration created",
               variant: "success"
             });
             this.$router.push({ name: "modules", params: {} });
@@ -222,7 +209,7 @@ export default {
         await updateModule(this.module)
           .then(() => {
             displayNotification(this, {
-              message: "Template saved",
+              message: "Configuration saved",
               variant: "success"
             });
             this.$router.push({ name: "modules", params: {} });

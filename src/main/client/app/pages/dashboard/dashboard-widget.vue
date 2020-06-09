@@ -17,11 +17,6 @@
         {{ text }}
       </p>
     </div>
-    <div class="widget-info">
-      <p class="widget-value">
-      AWS : 12 AZURE : 3 GOOGLE : 1 ONPREM : 0
-      </p>
-    </div>
   </router-link>
 </template>
 

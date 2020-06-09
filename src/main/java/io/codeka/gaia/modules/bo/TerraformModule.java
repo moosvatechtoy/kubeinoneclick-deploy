@@ -46,6 +46,10 @@ public class TerraformModule {
 
     private String mainProvider;
 
+    private boolean remoteRun;
+
+    private String terraformPath;
+
     public String getId() {
         return id;
     }
@@ -160,5 +164,21 @@ public class TerraformModule {
 
     public void setMainProvider(String mainProvider) {
         this.mainProvider = mainProvider;
+    }
+
+    public boolean isRemoteRun() {
+        return remoteRun;
+    }
+
+    public void setRemoteRun(boolean remoteRun) {
+        this.remoteRun = remoteRun;
+    }
+
+    public String getTerraformPath() {
+        return terraformPath;
+    }
+
+    public void setTerraformPath(String terraformPath) {
+        this.terraformPath = terraformPath;
     }
 }

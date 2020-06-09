@@ -9,10 +9,18 @@ import io.codeka.gaia.stacks.repository.JobRepository;
 import io.codeka.gaia.stacks.repository.StackRepository;
 import io.codeka.gaia.stacks.repository.StepRepository;
 import io.codeka.gaia.stacks.workflow.JobWorkflow;
+import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -26,6 +34,8 @@ import java.util.function.Supplier;
 @Service
 public class StackRunner {
 
+    private static final Logger LOG = LoggerFactory.getLogger(StackRunner.class);
+
     private DockerRunner dockerRunner;
     private StackCommandBuilder stackCommandBuilder;
     private StackRepository stackRepository;
@@ -33,6 +43,11 @@ public class StackRunner {
     private StepRepository stepRepository;
 
     private Map<String, Job> jobs = new HashMap<>();
+    private static final String[] TERRAFORM_COMMANDS =  new String[] {"terraform init", "terraform version", "terraform plan",
+            "terraform apply", "terraform destroy"};
+
+    @Value("${terraform.exe.path}")
+    private String terraformLocalExecPath;
 
     @Autowired
     public StackRunner(DockerRunner dockerRunner, StackCommandBuilder stackCommandBuilder,
@@ -93,7 +108,7 @@ public class StackRunner {
      * @param scriptFn    function allowing to get the right script to execute
      * @param resultFn    function treating the result ot the executed script
      */
-    private void treatJob(JobWorkflow jobWorkflow, Consumer<JobWorkflow> jobActionFn,
+    private void treatJob(JobWorkflow jobWorkflow,TerraformModule module, Consumer<JobWorkflow> jobActionFn,
                           Supplier<String> scriptFn, IntConsumer resultFn) {
         // execute the workflow of the job
         jobActionFn.accept(jobWorkflow);
@@ -106,7 +121,12 @@ public class StackRunner {
         // get the wanted script
         var script = scriptFn.get();
 
-        var result = this.dockerRunner.runContainerForJob(jobWorkflow, script);
+        int result = 0;
+        if (module.isRemoteRun()) {
+            result = this.dockerRunner.runContainerForJob(jobWorkflow, script);
+        } else {
+            result = runLocalForJob(jobWorkflow, script, module);
+        }
 
         // manage the result of the execution of the script
         resultFn.accept(result);
@@ -120,7 +140,7 @@ public class StackRunner {
     @Async
     public void plan(JobWorkflow jobWorkflow, TerraformModule module, Stack stack) {
         treatJob(
-            jobWorkflow,
+            jobWorkflow, module,
             JobWorkflow::plan,
             () -> managePlanScript(jobWorkflow.getJob(), stack, module),
             result -> managePlanResult(result, jobWorkflow, stack)
@@ -130,7 +150,7 @@ public class StackRunner {
     @Async
     public void apply(JobWorkflow jobWorkflow, TerraformModule module, Stack stack) {
         treatJob(
-            jobWorkflow,
+            jobWorkflow, module,
             JobWorkflow::apply,
             () -> manageApplyScript(jobWorkflow.getJob(), stack, module),
             result -> manageApplyResult(result, jobWorkflow, stack)
@@ -141,7 +161,7 @@ public class StackRunner {
     public void retry(JobWorkflow jobWorkflow, TerraformModule module, Stack stack) {
         stepRepository.deleteByJobId(jobWorkflow.getJob().getId());
         treatJob(
-            jobWorkflow,
+            jobWorkflow, module,
             JobWorkflow::retry,
             () -> managePlanScript(jobWorkflow.getJob(), stack, module),
             result -> managePlanResult(result, jobWorkflow, stack)
@@ -150,6 +170,44 @@ public class StackRunner {
 
     public Optional<Job> getJob(String jobId) {
         return Optional.ofNullable(this.jobs.get(jobId));
+    }
+
+    public int runLocalForJob(JobWorkflow jobWorkflow, String script, TerraformModule module) {
+        try {
+            String scriptLocal = replaceTerraformWithLocalPath(script, module);
+            var step = jobWorkflow.getCurrentStep();
+            final ProcessBuilder builder = new ProcessBuilder(scriptLocal);
+            final Process process = builder.start();
+            final BufferedReader stdInput = new BufferedReader(new InputStreamReader(process.getInputStream(), Charset.forName("UTF-8").newDecoder()));
+            final BufferedReader errorInput = new BufferedReader(new InputStreamReader(process.getErrorStream()));
+            String s = null;
+            while ((s = stdInput.readLine()) != null) {
+                LOG.debug(s);
+                step.getLogsWriter().append(s + '\n');
+            }
+            while ((s = errorInput.readLine()) != null) {
+                LOG.debug(s);
+                step.getLogsWriter().append(s + '\n');
+            }
+            return 0;
+        } catch (final IOException e) {
+            LOG.error("Exception when running job", e);
+            return 99;
+        }
+    }
+
+    private String replaceTerraformWithLocalPath(String script, TerraformModule module) {
+        String terraformLocalExecPathLocal = StringUtils.isNotEmpty(module.getTerraformPath()) ? module.getTerraformPath() : terraformLocalExecPath;
+        StringBuilder scriptLocal = new StringBuilder(script);
+        for(String command : TERRAFORM_COMMANDS) {
+            int startIndex = scriptLocal.indexOf(command);
+            if (startIndex == -1) {
+                continue;
+            }
+            int endIndex = startIndex + command.length();
+            scriptLocal.replace(startIndex, endIndex, terraformLocalExecPathLocal.concat(command));
+        }
+        return scriptLocal.toString();
     }
 
 }

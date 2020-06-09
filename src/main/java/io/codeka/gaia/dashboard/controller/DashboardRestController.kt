@@ -22,21 +22,23 @@ class DashboardRestController(
         when {
             user.isAdmin -> {
                 mapOf(
-                    "modulesCount" to moduleRepository.count(),
+                    "modulesCount" to moduleRepository.count(), "stacksCount" to stackRepository.count(),
                     "runningStacksCount" to stackRepository.countStacksByState(StackState.RUNNING),
-                    "toUpdateStacksCount" to stackRepository.countStacksByState(StackState.TO_UPDATE))
+                        "stacks" to stackRepository.findAll())
             }
             team != null -> {
                 mapOf(
                     "modulesCount" to moduleRepository.countByAuthorizedTeamsContainingOrModuleMetadataCreatedBy(team, user),
+                        "stacksCount" to stackRepository.countByOwnerTeam(team),
                     "runningStacksCount" to stackRepository.countStacksByStateAndOwnerTeam(StackState.RUNNING, team),
-                    "toUpdateStacksCount" to stackRepository.countStacksByStateAndOwnerTeam(StackState.TO_UPDATE, team))
+                        "stacks" to stackRepository.findByOwnerTeam(team))
             }
             else -> {
                 mapOf(
                     "modulesCount" to moduleRepository.countByModuleMetadataCreatedBy(user),
+                        "stacksCount" to stackRepository.countStacksByCreatedBy(user),
                     "runningStacksCount" to stackRepository.countStacksByStateAndCreatedBy(StackState.RUNNING, user),
-                    "toUpdateStacksCount" to stackRepository.countStacksByStateAndCreatedBy(StackState.TO_UPDATE, user))
+                        "stacks" to stackRepository.findByCreatedBy(user))
             }
         }
 

@@ -1,36 +1,45 @@
 <template>
   <div>
     <b-form-row>
-      <b-col cols="4">
-        <b-form-group description="The Template to create Provisioner">
-        <vue-multiselect
-          v-model="moduleId"
-          label="name"
-          track-by="id"
-          searchable
-          placeholder="Select Template"
-          :options="modules"
-          :show-labels="false"
-          @select="onModuleSelect"
-        />
-        </b-form-group>
-      </b-col>
-      <b-col cols="4">
+      <b-col cols="8">
         <b-button
           title="Add Provisioner"
           variant="success"
           class="mb-4"
-          :disabled="!moduleId"
-          @click="createStack()"
+          v-b-modal.modal-prevent-closing
         >
           <font-awesome-icon icon="plus" />Add Provisioner
         </b-button>
+      </b-col>
+      <b-col cols="2">
+        <vue-multiselect
+          v-model="provider"
+          id="provider-input"
+          label="name"
+          track-by="id"
+          searchable
+          placeholder="Select Provider"
+          :options="modules"
+          :show-labels="false"
+          @select="onProviderSelect"
+          @Remove="onProviderRemove"
+        />
+      </b-col>
+      <b-col cols="2">
+        <vue-multiselect
+          v-model="status"
+          searchable
+          placeholder="Select Status"
+          :show-labels="false"
+          :options="['NEW', 'RUNNING']"
+          @select="onStatusSelect"
+        />
       </b-col>
     </b-form-row>
 
     <b-card-group columns>
       <b-card
-        v-for="stack in stacks"
+        v-for="stack in filteredStacks"
         :key="stack.id"
         :title="stack.name"
         :sub-title="stack.description"
@@ -53,6 +62,37 @@
         </b-button>
       </b-card>
     </b-card-group>
+
+    <b-modal
+      id="modal-prevent-closing"
+      ref="modal"
+      title="Select Provider"
+      @show="resetModal"
+      @hidden="resetModal"
+      @ok="handleOk"
+    >
+      <form ref="form" @submit.stop.prevent="handleSubmit">
+        <b-form-group
+          :state="templateState"
+          description="The Provider to create Provisioner"
+          label-for="template-input"
+          invalid-feedback="Provider is required to create Provisioner"
+        >
+        <vue-multiselect
+          v-model="moduleId"
+          id="template-input"
+          label="name"
+          track-by="id"
+          searchable
+          placeholder="Select Provider"
+          :options="modules"
+          :show-labels="false"
+          :state="templateState"
+          required
+        />
+        </b-form-group>
+      </form>
+    </b-modal>
   </div>
 </template>
 
@@ -63,9 +103,13 @@ import { getModules } from "@/shared/api/modules-api";
 export default {
   name: "AppStacks",
   data: () => ({
+    templateState: null,
     stacks: [],
+    filteredStacks: [],
     modules: [],
     moduleId: "",
+    provider: '',
+    status: '',
     states: {
       NEW: {
         variant: "success",
@@ -94,8 +138,9 @@ export default {
     }
   }),
   async created() {
-    this.stacks = await getStacks();
     this.modules = await getModules();
+    this.stacks = await getStacks();
+    this.onProviderSelect(this.provider);
   },
 
   methods: {
@@ -108,9 +153,49 @@ export default {
         }
       });
     },
-    onModuleSelect(module) {
-      this.moduleId = module.id;
-    }
+    onProviderSelect(provider) {
+      this.filterByProviderAndStatus(provider, this.status)
+    },
+    onStatusSelect(status) {
+      this.filterByProviderAndStatus(this.provider, status)
+    },
+    filterByProviderAndStatus(provider, status) {
+      let items = this.stacks;
+      if (provider !== '') { 
+        items = items.filter(item => item.moduleId === provider.id);
+      }
+
+      if (status !== '') { 
+        items = items.filter(item => item.state === status);
+      }
+      this.filteredStacks = items;
+    },
+    onProviderRemove(provider) {
+      this.filteredStacks = this.stacks;
+    },
+    checkFormValidity() {
+        const valid = this.moduleId !== '';
+        this.templateState = valid;
+        return valid;
+      },
+      resetModal() {
+        this.templateState = null;
+        this.moduleId = '';
+      },
+      handleOk(bvModalEvt) {
+        bvModalEvt.preventDefault();
+        this.handleSubmit();
+      },
+      handleSubmit() {
+        if (!this.checkFormValidity()) {
+          return;
+        } else {
+          this.createStack();
+        }
+        this.$nextTick(() => {
+          this.$bvModal.hide('modal-prevent-closing')
+        })
+      }
   }
 };
 </script>

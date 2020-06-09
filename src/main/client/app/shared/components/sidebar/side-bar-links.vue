@@ -36,7 +36,7 @@
           route: 'settings', icon: 'cog', class: 'yellow_color', title: 'Settings', roles: ['ROLE_ADMIN'],
         },
         {
-          route: 'modules', icon: 'object-group', class: 'blue1_color', title: 'Templates', roles: ['ROLE_ADMIN'],
+          route: 'modules', icon: 'object-group', class: 'blue1_color', title: 'Configurations', roles: ['ROLE_ADMIN'],
         },
         {
           route: 'users', icon: 'user-friends', class: 'yellow_color', title: 'Users', roles: ['ROLE_ADMIN'],

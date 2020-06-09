@@ -4,27 +4,17 @@
       <b-col cols="10">
         <b-button
           :to="{ name: 'module', params: { moduleId: 'ADD' }}"
-          title="Add Template"
+          title="Add Configuration"
           variant="success"
           class="mb-4"
         >
-          <font-awesome-icon icon="plus" />Add Template
+          <font-awesome-icon icon="plus" />Add Configuration
         </b-button>
-      </b-col>
-      <b-col cols="2">
-        <vue-multiselect
-          v-model="provider"
-          searchable
-          placeholder="Select Provider"
-          :show-labels="false"
-          :options="['', 'AWS','AZURE', 'GOOGLE', 'ONPREM']"
-          @select="onProviderSelect"
-        />
       </b-col>
     </b-form-row>
 
     <b-card-group columns>
-      <b-card v-for="module in filteredModules" :key="module.id" :title="module.name" class="moduleCard">
+      <b-card v-for="module in modules" :key="module.id" :title="module.name" class="moduleCard">
         <b-card-text>
           <app-cli-badge
             :cli="module.terraformImage"
@@ -41,7 +31,7 @@
 
         <b-button
           :to="{ name: 'module', params: { moduleId: module.id }}"
-          title="Edit this Template"
+          title="Edit this Configuration"
           variant="primary"
           class="mr-1"
         >
@@ -50,7 +40,7 @@
 
         <b-button
           :to="{ name: 'module_description', params: { moduleId: module.id }}"
-          title="Detail of this Template"
+          title="Detail of this Configuration"
           variant="primary"
           class="mr-1"
         >
@@ -58,7 +48,7 @@
         </b-button>
 
         <b-button
-          title="Run this Template"
+          title="Run this Configuration"
           variant="primary"
           class="mr-1"
           @click="createStack(module.id)"
@@ -67,7 +57,7 @@
         </b-button>
 
         <b-button
-          title="Delete this Template"
+          title="Delete this Configuration"
           variant="danger"
           class="mr-1"
           @click="createStack(module.id)"
@@ -92,15 +82,12 @@ export default {
 
   data: function data() {
     return {
-      filteredModules: [],
-      modules: [],
-      provider: "AWS"
+      modules: []
     };
   },
 
   async created() {
     this.modules = await getModules();
-    this.filteredModules = this.modules.filter(item => item.mainProvider === 'AWS');
   },
 
   methods: {
@@ -111,13 +98,6 @@ export default {
           moduleId
         }
       });
-    },
-    onProviderSelect(provider) {
-      if (provider !== '') {
-        this.filteredModules = this.modules.filter(item => item.mainProvider === provider);
-      } else {
-        this.filteredModules = this.modules;
-      }
     }
   }
 };
