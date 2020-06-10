@@ -3,6 +3,9 @@ package io.codeka.gaia.modules.controller;
 import io.codeka.gaia.modules.bo.TerraformModule;
 import io.codeka.gaia.modules.repository.TerraformModuleGitRepository;
 import io.codeka.gaia.modules.repository.TerraformModuleRepository;
+import io.codeka.gaia.stacks.bo.Stack;
+import io.codeka.gaia.stacks.repository.JobRepository;
+import io.codeka.gaia.stacks.repository.StackRepository;
 import io.codeka.gaia.teams.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -29,10 +32,17 @@ public class ModuleRestController {
 
     private TerraformModuleGitRepository moduleGitRepository;
 
+    private StackRepository stackRepository;
+
+    private JobRepository jobRepository;
+
     @Autowired
-    public ModuleRestController(TerraformModuleRepository moduleRepository, TerraformModuleGitRepository moduleGitRepository) {
+    public ModuleRestController(TerraformModuleRepository moduleRepository, TerraformModuleGitRepository moduleGitRepository,
+                                StackRepository stackRepository, JobRepository jobRepository) {
         this.moduleRepository = moduleRepository;
         this.moduleGitRepository = moduleGitRepository;
+        this.stackRepository = stackRepository;
+        this.jobRepository = jobRepository;
     }
 
     @GetMapping
@@ -81,6 +91,22 @@ public class ModuleRestController {
     public Optional<String> readme(@PathVariable String id) {
         var module = moduleRepository.findById(id).orElseThrow();
         return moduleGitRepository.getReadme(module);
+    }
+
+    @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.OK)
+    public void deleteModule(@PathVariable String id, User user){
+        var module = moduleRepository.findById(id).orElseThrow(ModuleNotFoundException::new);
+        if(!module.isAuthorizedFor(user)){
+            throw new ModuleForbiddenException();
+        }
+        List<Stack> stackList = stackRepository.findByModuleId(id);
+        for (Stack stack : stackList) {
+            jobRepository.deleteByStackId(stack.getId());
+            stackRepository.deleteById(stack.getId());
+        }
+
+        moduleRepository.deleteById(id);
     }
 
 }

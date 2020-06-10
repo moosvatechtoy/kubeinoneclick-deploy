@@ -60,6 +60,14 @@
         >
           <font-awesome-icon icon="edit" />
         </b-button>
+        <b-button
+          title="Delete this Provisioner"
+          variant="danger"
+          class="mr-1"
+          @click="deleteStack(stack.id)"
+        >
+          <font-awesome-icon :icon="['far', 'trash-alt']" />
+        </b-button>
       </b-card>
     </b-card-group>
 
@@ -97,11 +105,18 @@
 </template>
 
 <script>
-import { getStacks } from "@/shared/api/stacks-api";
+import { getStacks, deleteStack } from "@/shared/api/stacks-api";
+import { displayNotification } from "@/shared/services/modal-service";
 import { getModules } from "@/shared/api/modules-api";
 
 export default {
   name: "AppStacks",
+  props: {
+      moduleParam: {
+        type: String,
+        required: false
+      },
+    },
   data: () => ({
     templateState: null,
     stacks: [],
@@ -138,6 +153,7 @@ export default {
     }
   }),
   async created() {
+    console.log('Module Params:::', this.moduleParam);
     this.modules = await getModules();
     this.stacks = await getStacks();
     this.onProviderSelect(this.provider);
@@ -152,6 +168,24 @@ export default {
            moduleId:module
         }
       });
+    },
+    async deleteStack(stackId) {
+      await deleteStack(stackId)
+          .then(() => {
+            displayNotification(this, {
+              message: "Stack deleted",
+              variant: "success"
+            });
+            let index = this.stacks.findIndex(item => item.id === stackId);
+            this.stacks.splice(index, 1);
+          })
+          .catch(({ error, message }) =>
+            displayNotification(this, {
+              title: error,
+              message,
+              variant: "danger"
+            })
+          );
     },
     onProviderSelect(provider) {
       this.filterByProviderAndStatus(provider, this.status)

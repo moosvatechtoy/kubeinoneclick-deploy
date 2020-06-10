@@ -60,7 +60,7 @@
           title="Delete this Configuration"
           variant="danger"
           class="mr-1"
-          @click="createStack(module.id)"
+          @click="deleteModule(module.id)"
         >
           <font-awesome-icon :icon="['far', 'trash-alt']" />
         </b-button>
@@ -70,8 +70,8 @@
 </template>
 
 <script>
-import { getModules } from "@/shared/api/modules-api";
-
+import { getModules, deleteModule } from "@/shared/api/modules-api";
+import { displayNotification } from "@/shared/services/modal-service";
 import { AppCliBadge } from "@/shared/components";
 
 export default {
@@ -91,6 +91,24 @@ export default {
   },
 
   methods: {
+    async deleteModule(moduleId) {
+      await deleteModule(moduleId)
+          .then(() => {
+            displayNotification(this, {
+              message: "Module deleted",
+              variant: "success"
+            });
+            let index = this.modules.findIndex(item => item.id === moduleId);
+            this.modules.splice(index, 1);
+          })
+          .catch(({ error, message }) =>
+            displayNotification(this, {
+              title: error,
+              message,
+              variant: "danger"
+            })
+          );
+    },
     createStack(moduleId) {
       this.$router.push({
         name: "stack_creation",

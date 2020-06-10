@@ -140,7 +140,6 @@ export default {
       return (
         [
           this.module.name,
-          this.module.mainProvider,
           this.module.gitRepositoryUrl
         ].every(this.notEmpty) &&
         this.module.variables
@@ -154,15 +153,15 @@ export default {
   async created() {
     console.log(this.moduleId);
     if (this.moduleId === "ADD") {
-      this.module = {};
-      this.module.moduleMetadata = {};
-      this.module.remoteRun = true;
-      this.module.terraformPath = '/usr/local/terraform'
-      this.module.terraformImage = {
+      let dataModule = {};
+      dataModule.moduleMetadata = {};
+      dataModule.remoteRun = false;
+      dataModule.terraformPath = '/usr/local/terraform'
+      dataModule.terraformImage = {
         repository: "hashicorp/terraform",
         tag: "latest"
       };
-      this.module.variables = [
+      dataModule.variables = [
         { name: "aws_region_name", editable: true },
         { name: "cluster-name", defaultValue: "", editable: true },
         { name: "desired_size", defaultValue: "", editable: true },
@@ -172,7 +171,8 @@ export default {
         { name: "vpc_cidr_block", defaultValue: "", editable: true },
         { name: "vpc_subnet", defaultValue: "", editable: true }
       ];
-      this.module.moduleMetadata = {};
+      dataModule.moduleMetadata = {};
+      this.module = await dataModule;
       this.isCreate = true;
     } else {
       this.module = await getModule(this.moduleId);

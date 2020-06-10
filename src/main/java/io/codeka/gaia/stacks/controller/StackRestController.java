@@ -99,6 +99,13 @@ public class StackRestController {
         return Map.of("jobId", job.getId());
     }
 
+    @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.OK)
+    public void deleteStack(@PathVariable String id) {
+        jobRepository.deleteByStackId(id);
+        stackRepository.deleteById(id);
+    }
+
 }
 
 @ResponseStatus(HttpStatus.NOT_FOUND)

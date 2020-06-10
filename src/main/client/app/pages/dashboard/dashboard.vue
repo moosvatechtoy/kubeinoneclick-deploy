@@ -41,7 +41,7 @@
             :text="moduleCount.name + ' Provisioners'"
             :value="moduleCount.counts"
             icon="layer-group"
-            :to="{ name: 'stacks' }"
+            :to="{ name: 'stacks', params: { moduleParam: moduleCount.name} }"
           />
         </b-overlay>
       </div>

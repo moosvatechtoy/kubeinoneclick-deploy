@@ -21,4 +21,5 @@ interface StackRepository : MongoRepository<Stack, String> {
     fun findByOwnerTeam(team: Team): List<Stack>
     fun countByOwnerTeam(team: Team): Long
     fun findByIdAndOwnerTeam(id: String, team: Team): Optional<Stack>
+    fun findByModuleId(moduleId: String): List<Stack>
 }

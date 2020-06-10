@@ -9,3 +9,5 @@ export const getModuleReadme = async (moduleId) => axios.get(`/api/modules/${mod
 export const updateModule = async (module) => axios.put(`/api/modules/${module.id}`, module);
 
 export const createModule = async (module) => axios.post('/api/modules', module);
+
+export const deleteModule = async (moduleId) => axios.delete(`/api/modules/${moduleId}`);

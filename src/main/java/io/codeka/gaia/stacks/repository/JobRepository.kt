@@ -12,4 +12,6 @@ interface JobRepository : MongoRepository<Job, String> {
 
     fun findAllByStackIdOrderByStartDateTimeDesc(stackId: String): List<Job>
 
+    fun deleteByStackId(stackId: String)
+
 }
