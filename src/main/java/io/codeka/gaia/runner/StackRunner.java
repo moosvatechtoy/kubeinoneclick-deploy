@@ -176,7 +176,7 @@ public class StackRunner {
         try {
             String scriptLocal = replaceTerraformWithLocalPath(script, module);
             var step = jobWorkflow.getCurrentStep();
-            final ProcessBuilder builder = new ProcessBuilder(scriptLocal);
+            final ProcessBuilder builder = new ProcessBuilder("bash", "-c", scriptLocal);
             final Process process = builder.start();
             final BufferedReader stdInput = new BufferedReader(new InputStreamReader(process.getInputStream(), Charset.forName("UTF-8").newDecoder()));
             final BufferedReader errorInput = new BufferedReader(new InputStreamReader(process.getErrorStream()));
