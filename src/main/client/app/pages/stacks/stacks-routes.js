@@ -2,6 +2,7 @@ const stacksRoutes = [
   {
     path: '/stacks',
     name: 'stacks',
+    props: true,
     component: () => import(/* webpackChunkName: "chunk-stacks" */ '@/pages/stacks/stacks.vue'),
     meta: {
       authorities: ['ROLE_USER'],

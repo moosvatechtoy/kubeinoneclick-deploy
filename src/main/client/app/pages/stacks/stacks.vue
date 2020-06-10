@@ -153,9 +153,14 @@ export default {
     }
   }),
   async created() {
-    console.log('Module Params:::', this.moduleParam);
     this.modules = await getModules();
     this.stacks = await getStacks();
+    if (this.moduleParam) {
+      let moduleFiltered = this.modules.filter(item => item.name === this.moduleParam);
+      if (moduleFiltered && moduleFiltered.length > 0) {
+        this.provider = moduleFiltered[0];
+      }
+    }
     this.onProviderSelect(this.provider);
   },
 
