@@ -59,11 +59,16 @@ public class StackCommandBuilder {
                 .setStateApiUser(stateApiSecurityProperties.getUsername())
                 .setStateApiPassword(stateApiSecurityProperties.getPassword())
                 .setStackId(stack.getId())
-                .setGitRepositoryUrl(evalGitRepositoryUrl(module))
                 .setTerraformImage(job.getTerraformImage().image());
 
         if (StringUtils.isNotBlank(module.getDirectory())) {
             script.setGitDirectory(module.getDirectory());
+        }
+
+        if (module.isRemoteCode()) {
+            script.setGitRepositoryUrl(evalGitRepositoryUrl(module));
+        } else {
+            script.setLocalDirectory(module.getLocalCodeLocation());
         }
 
         script.setCommand(command.apply(stack, module));

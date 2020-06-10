@@ -3,11 +3,13 @@ package io.codeka.gaia.modules.controller;
 import io.codeka.gaia.modules.bo.TerraformModule;
 import io.codeka.gaia.modules.repository.TerraformModuleGitRepository;
 import io.codeka.gaia.modules.repository.TerraformModuleRepository;
+import io.codeka.gaia.modules.util.ModuleUtil;
 import io.codeka.gaia.stacks.bo.Stack;
 import io.codeka.gaia.stacks.repository.JobRepository;
 import io.codeka.gaia.stacks.repository.StackRepository;
 import io.codeka.gaia.teams.User;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
@@ -35,6 +37,9 @@ public class ModuleRestController {
     private StackRepository stackRepository;
 
     private JobRepository jobRepository;
+
+    @Value("${cloud.credentials.path}")
+    private String credentialsLocation;
 
     @Autowired
     public ModuleRestController(TerraformModuleRepository moduleRepository, TerraformModuleGitRepository moduleGitRepository,
@@ -70,6 +75,7 @@ public class ModuleRestController {
     public TerraformModule createModule(@RequestBody TerraformModule module, User user){
         module.setId(UUID.randomUUID().toString());
         module.getModuleMetadata().setCreatedBy(user);
+        ModuleUtil.addSecretFile(module, credentialsLocation);
         return moduleRepository.save(module);
     }
 
@@ -82,7 +88,7 @@ public class ModuleRestController {
 
         module.getModuleMetadata().setUpdatedBy(user);
         module.getModuleMetadata().setUpdatedAt(LocalDateTime.now());
-
+        ModuleUtil.addSecretFile(module, credentialsLocation);
         return moduleRepository.save(module);
     }
 

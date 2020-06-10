@@ -7,10 +7,23 @@
     <div class="block_content">
       <form>
         <b-form-row>
-          <b-col>
+          <b-col cols="3">
             <b-form-group label="Name" description="The name of your Configuration">
               <b-input id="module.name" v-model="module.name" :state="notEmpty(module.name)" />
               <b-form-invalid-feedback>This field is mandatory</b-form-invalid-feedback>
+            </b-form-group>
+          </b-col>
+          <b-col cols="2">
+            <b-form-group label="Provider">
+            <vue-multiselect
+              v-model="module.mainProvider"
+              searchable
+              placeholder="Select Provider"
+              :show-labels="false"
+              required
+              :options="['AWS','AZURE', 'GOOGLE', 'ONPREM']"
+            />
+            <b-form-invalid-feedback>This field is mandatory</b-form-invalid-feedback>
             </b-form-group>
           </b-col>
           <b-col cols="2">
@@ -38,7 +51,12 @@
         </b-form-group>
 
         <b-form-row>
-          <b-col>
+          <b-col cols="2">
+            <b-form-checkbox style="margin-top: 30px;" v-model="module.remoteCode" name="remoteRun-button" switch>
+                Git Repository
+              </b-form-checkbox>
+          </b-col>
+          <b-col v-if="module.remoteCode">
             <b-form-group
               label="Git Repository URL"
               description="The URL of the Configuration's git repository"
@@ -50,12 +68,20 @@
               <b-form-invalid-feedback>This field is mandatory</b-form-invalid-feedback>
             </b-form-group>
           </b-col>
-          <b-col>
+          <b-col v-if="module.remoteCode">
             <b-form-group
               label="Git repository directory"
               description="The sub-directory of the Configuration's code inside the repository (leave empty if root)"
             >
               <b-input v-model="module.directory" />
+            </b-form-group>
+          </b-col>
+          <b-col v-if="!module.remoteCode">
+            <b-form-group
+              label="Local repository directory"
+              description="The local directory of the Configuration's code"
+            >
+              <b-input v-model="module.localCodeLocation" />
             </b-form-group>
           </b-col>
         </b-form-row>
@@ -91,6 +117,10 @@
           :variable="modVar"
           @removeVar="removeVar"
         />
+
+        <b-form-group label="Credentials" description="The sercret key of cloud provider">
+          <b-form-textarea v-model="module.secretKey" @change="encodeCredentials()"/>
+        </b-form-group>
 
         <b-button variant="primary" :disabled="!formValid" @click="save">
           <font-awesome-icon icon="save" />Save
@@ -140,12 +170,13 @@ export default {
       return (
         [
           this.module.name,
-          this.module.gitRepositoryUrl
+          this.module.mainProvider,
+          this.module.remoteCode ? this.module.gitRepositoryUrl : this.module.localCodeLocation
         ].every(this.notEmpty) &&
         this.module.variables
           .map(variable => variable.name)
           .every(this.notEmpty) &&
-        this.isTerraformImageValid
+        (module.remoteRun ? this.isTerraformImageValid : true)
       );
     }
   },
@@ -156,7 +187,9 @@ export default {
       let dataModule = {};
       dataModule.moduleMetadata = {};
       dataModule.remoteRun = false;
-      dataModule.terraformPath = '/usr/local/terraform'
+      dataModule.remoteCode = true;
+      dataModule.terraformPath = '/usr/local/terraform';
+      dataModule.mainProvider = 'AWS';
       dataModule.terraformImage = {
         repository: "hashicorp/terraform",
         tag: "latest"
@@ -188,7 +221,6 @@ export default {
       );
     },
     async save() {
-      this.module.mainProvider = this.module.name;
       if (this.isCreate) {
         await createModule(this.module)
           .then(() => {
@@ -231,6 +263,12 @@ export default {
     },
     addVar() {
       this.module.variables.push({});
+    },
+    encodeCredentials() {
+      let base64 = /^([A-Za-z0-9+/]{4})*([A-Za-z0-9+/]{4}|[A-Za-z0-9+/]{3}=|[A-Za-z0-9+/]{2}==)$/;
+      if (!base64.test(this.module.secretKey)) {
+        this.module.secretKey = btoa(this.module.secretKey);
+      }
     }
   }
 };

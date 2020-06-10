@@ -50,6 +50,12 @@ public class TerraformModule {
 
     private String terraformPath;
 
+    private boolean remoteCode;
+
+    private String localCodeLocation;
+
+    private String secretKey;
+
     public String getId() {
         return id;
     }
@@ -180,5 +186,29 @@ public class TerraformModule {
 
     public void setTerraformPath(String terraformPath) {
         this.terraformPath = terraformPath;
+    }
+
+    public boolean isRemoteCode() {
+        return remoteCode;
+    }
+
+    public void setRemoteCode(boolean remoteCode) {
+        this.remoteCode = remoteCode;
+    }
+
+    public String getLocalCodeLocation() {
+        return localCodeLocation;
+    }
+
+    public void setLocalCodeLocation(String localCodeLocation) {
+        this.localCodeLocation = localCodeLocation;
+    }
+
+    public String getSecretKey() {
+        return secretKey;
+    }
+
+    public void setSecretKey(String secretKey) {
+        this.secretKey = secretKey;
     }
 }
