@@ -5,7 +5,7 @@ RUN mvn --batch-mode -DskipTests -f /usr/src/app/pom.xml clean package
 
 FROM openjdk:14-jdk
 EXPOSE 8080
-COPY --from=BUILD /usr/src/app/target/*.jar /opt/target/gaia.jar
+COPY --from=BUILD /usr/src/app/target/*.jar /opt/target/oneclick.jar
 WORKDIR /opt/target
 
-CMD ["java", "-jar", "gaia.jar"]
+CMD ["java", "-jar", "oneclick.jar"]

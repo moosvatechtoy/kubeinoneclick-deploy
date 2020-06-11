@@ -4,7 +4,7 @@
       <div class="login-pic">
         <img
           src="https://13zmfmnuenq8wqpf1ttwov16-wpengine.netdna-ssl.com/wp-content/uploads/2019/12/PK-Red.png"
-          alt="gaia-logo"
+          alt="oneclick-logo"
         >
       </div>
 

@@ -1,6 +1,6 @@
-gaia = db.getSiblingDB('gaia');
-gaia.job.drop();
-gaia.job.insert([
+oneclick = db.getSiblingDB('oneclick');
+oneclick.job.drop();
+oneclick.job.insert([
     {
         "_id" : "32e4c316-287a-48ba-9c49-dd1b1a0204c8",
         "stackId" : "de28a01f-257a-448d-8e1b-00e4e3a41db2",
@@ -26,7 +26,7 @@ gaia.job.insert([
             "$ref" : "user",
             "$id" : "selmak"
         },
-        "_class" : "io.codeka.gaia.stacks.bo.Job"
+        "_class" : "com.prokarma.oneclick.stacks.bo.Job"
     },
     {
         "_id" : "5e856dc7-6bed-465f-abf1-02980206ab2a",
@@ -53,7 +53,7 @@ gaia.job.insert([
             "$ref" : "user",
             "$id" : "selmak"
         },
-        "_class" : "io.codeka.gaia.stacks.bo.Job"
+        "_class" : "com.prokarma.oneclick.stacks.bo.Job"
     }
 
 ]);

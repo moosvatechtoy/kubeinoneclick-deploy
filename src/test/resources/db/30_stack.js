@@ -1,6 +1,6 @@
-gaia = db.getSiblingDB('gaia');
-gaia.stack.drop();
-gaia.stack.insert([
+oneclick = db.getSiblingDB('oneclick');
+oneclick.stack.drop();
+oneclick.stack.insert([
     {
         "_id": "5a215b6b-fe53-4afa-85f0-a10175a7f264",
         "moduleId": "e01f9925-a559-45a2-8a55-f93dc434c676",
@@ -70,6 +70,6 @@ gaia.stack.insert([
             "$id" : "admin"
         },
         "updatedAt" : ISODate("2020-02-05T07:01:29.935Z"),
-        "_class" : "io.codeka.gaia.stacks.bo.Stack"
+        "_class" : "com.prokarma.oneclick.stacks.bo.Stack"
     }
 ]);

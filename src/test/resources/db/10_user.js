@@ -1,6 +1,6 @@
-gaia = db.getSiblingDB('gaia');
-gaia.user.drop();
-gaia.user.insert([
+oneclick = db.getSiblingDB('oneclick');
+oneclick.user.drop();
+oneclick.user.insert([
     {
         "_id": "admin",
         "team": {"$ref": "team", "$id": "Ze Team"}

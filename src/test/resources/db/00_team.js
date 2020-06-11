@@ -1,6 +1,6 @@
-let gaia = db.getSiblingDB('gaia');
-gaia.team.drop();
-gaia.team.insert([
+let oneclick = db.getSiblingDB('oneclick');
+oneclick.team.drop();
+oneclick.team.insert([
     {
         "_id": "Ze Team"
     },

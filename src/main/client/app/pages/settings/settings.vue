@@ -4,7 +4,7 @@
       <b-form-group
         label="External url"
         label-for="externalUrl"
-        description="This is gaia's external URL. This is needed to allow terraform backend support."
+        description="This is oneclick's external URL. This is needed to allow terraform backend support."
       >
         <b-form-input
           id="externalUrl"

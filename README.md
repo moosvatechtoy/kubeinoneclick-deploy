@@ -2,7 +2,7 @@
   <img width="500" src="assets/gaia_logo_with_title.png">
 </p>
 
-Gaia is a Terraform UI for your Terraform modules, and self-service infrastructure.
+Oneclick is a Terraform UI for your Terraform modules, and self-service infrastructure.
 
 [![Build Status](https://travis-ci.com/gaia-app/gaia.svg?branch=master)](https://travis-ci.com/gaia-app/gaia)
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=gaia-app%3Agaia&metric=alert_status)](https://sonarcloud.io/dashboard?id=gaia-app%3Agaia)
@@ -12,7 +12,7 @@ Gaia is a Terraform UI for your Terraform modules, and self-service infrastructu
 
 ## What is it?
 
-Gaia is a web application to import and run your Terraform modules.
+Oneclick is a web application to import and run your Terraform modules.
 It features : 
 * importing modules from source code (Github/Gitlab)
 * validation of Terraform variables values (mandatory variables, regex-based validation)
@@ -36,18 +36,18 @@ The job view shows you the Terraform workflow, and the logs of the `plan` and `a
 
 ## Requirements
 
-Gaia needs :
+Oneclick needs :
  * a docker daemon (used to run Terraform itself)
  * and a MongoDb database (to store its data)
    * we currently support MongoDb 4.0 only
 
 ## Quick start
 
-Start Gaia with `docker-compose` quickly !
+Start Oneclick with `docker-compose` quickly !
 
 Clone this repository, and just run `docker-compose up -d`. 
 
-The docker-compose will start a Gaia server, listening on http://localhost:8080, and a MongoDb database.
+The docker-compose will start a Oneclick server, listening on http://localhost:8080, and a MongoDb database.
 
 Default credentials for entering:
 
@@ -67,4 +67,4 @@ Default credentials for entering:
 
 ## Contributors
 
-Gaia is made with ❤️ in  🇫🇷 by [Cyril DUBUISSON](https://github.com/cdubuisson) and [Julien WITTOUCK](https://github.com/juwit)
+Oneclick is made with ❤️ in  🇫🇷 by [Cyril DUBUISSON](https://github.com/cdubuisson) and [Julien WITTOUCK](https://github.com/juwit)

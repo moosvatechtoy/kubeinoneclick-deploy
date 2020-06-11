@@ -1,6 +1,6 @@
-gaia = db.getSiblingDB('gaia');
-gaia.terraformModule.drop();
-gaia.terraformModule.insert([
+oneclick = db.getSiblingDB('oneclick');
+oneclick.terraformModule.drop();
+oneclick.terraformModule.insert([
     {
         "_id": "e01f9925-a559-45a2-8a55-f93dc434c676",
         "name": "terraform-docker-mongo",

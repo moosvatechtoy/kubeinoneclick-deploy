@@ -1,6 +1,6 @@
-gaia = db.getSiblingDB('gaia');
-gaia.terraformState.drop();
-gaia.terraformState.insert([
+oneclick = db.getSiblingDB('oneclick');
+oneclick.terraformState.drop();
+oneclick.terraformState.insert([
     {
         "_id" : "de28a01f-257a-448d-8e1b-00e4e3a41db2",
         "value" : {
@@ -127,6 +127,6 @@ gaia.terraformState.insert([
                 }
             ]
         },
-        "_class" : "io.codeka.gaia.stacks.bo.TerraformState"
+        "_class" : "com.prokarma.oneclick.stacks.bo.TerraformState"
     }
 ]);
