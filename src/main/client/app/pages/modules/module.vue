@@ -15,30 +15,38 @@
           </b-col>
           <b-col cols="2">
             <b-form-group label="Provider">
-            <vue-multiselect
-              v-model="module.mainProvider"
-              searchable
-              placeholder="Select Provider"
-              :show-labels="false"
-              required
-              :options="['AWS','AZURE', 'GOOGLE', 'ONPREM']"
-            />
-            <b-form-invalid-feedback>This field is mandatory</b-form-invalid-feedback>
+              <vue-multiselect
+                v-model="module.mainProvider"
+                searchable
+                placeholder="Select Provider"
+                :show-labels="false"
+                required
+                :options="['AWS','AZURE', 'GOOGLE', 'ONPREM']"
+              />
+              <b-form-invalid-feedback>This field is mandatory</b-form-invalid-feedback>
             </b-form-group>
           </b-col>
           <b-col cols="2">
-            <b-form-checkbox style="margin-top: 30px;" v-model="module.remoteRun" name="remoteRun-button" switch>
-                Container
-              </b-form-checkbox>
+            <b-form-checkbox
+              style="margin-top: 30px;"
+              v-model="module.remoteRun"
+              name="remoteRun-button"
+              switch
+            >Container</b-form-checkbox>
           </b-col>
-          <b-col cols="4"  v-if="!module.remoteRun">
+          <b-col cols="4" v-if="!module.remoteRun">
             <b-form-group label="Terraform Path" description="Terraform installed location">
-              <b-input id="module.terraformPath" v-model="module.terraformPath" :state="notEmpty(module.terraformPath)" />
+              <b-input
+                id="module.terraformPath"
+                v-model="module.terraformPath"
+                :state="notEmpty(module.terraformPath)"
+              />
               <b-form-invalid-feedback>Terraform Location is mandatory</b-form-invalid-feedback>
             </b-form-group>
           </b-col>
           <b-col :md="isTerraformImageOverride ? '5' : '3'">
-            <app-terraform-image-input v-if="module.remoteRun"
+            <app-terraform-image-input
+              v-if="module.remoteRun"
               :image="module.terraformImage"
               @form-status="isTerraformImageValid = $event"
               @override-status="isTerraformImageOverride = $event"
@@ -52,10 +60,15 @@
 
         <b-form-row>
           <b-col cols="2">
-            <b-form-checkbox style="margin-top: 30px;" v-model="module.remoteCode" name="remoteRun-button" switch>
-                Git Repository
-              </b-form-checkbox>
+            <b-form-checkbox
+              style="margin-top: 10px; margin-bottom: 10px;"
+              v-model="module.remoteCode"
+              name="remoteRun-button"
+              switch
+            >Git Repository</b-form-checkbox>
           </b-col>
+        </b-form-row>
+        <b-form-row>
           <b-col v-if="module.remoteCode">
             <b-form-group
               label="Git Repository URL"
@@ -119,7 +132,7 @@
         />
 
         <b-form-group label="Credentials" description="The sercret key of cloud provider">
-          <b-form-textarea v-model="module.secretKey" @change="encodeCredentials()"/>
+          <b-form-textarea v-model="module.secretKey" @change="encodeCredentials()" />
         </b-form-group>
 
         <b-button variant="primary" :disabled="!formValid" @click="save">
@@ -171,7 +184,9 @@ export default {
         [
           this.module.name,
           this.module.mainProvider,
-          this.module.remoteCode ? this.module.gitRepositoryUrl : this.module.localCodeLocation
+          this.module.remoteCode
+            ? this.module.gitRepositoryUrl
+            : this.module.localCodeLocation
         ].every(this.notEmpty) &&
         this.module.variables
           .map(variable => variable.name)
@@ -188,8 +203,8 @@ export default {
       dataModule.moduleMetadata = {};
       dataModule.remoteRun = false;
       dataModule.remoteCode = true;
-      dataModule.terraformPath = '/usr/local/terraform';
-      dataModule.mainProvider = 'AWS';
+      dataModule.terraformPath = "/usr/local/terraform";
+      dataModule.mainProvider = "AWS";
       dataModule.terraformImage = {
         repository: "hashicorp/terraform",
         tag: "latest"
