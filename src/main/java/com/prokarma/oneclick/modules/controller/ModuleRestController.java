@@ -34,7 +34,6 @@ import java.util.UUID;
 public class ModuleRestController {
 
     private static  final String GOOGLE_PROVIDER = "GOOGLE";
-    private static  final String GOOGLE_PROVIDER_CRED_FORMAT = "${file(\"%s\")}";
     private static  final String CRED_VAR_KEY = "credentials";
 
     private TerraformModuleRepository moduleRepository;
@@ -84,7 +83,7 @@ public class ModuleRestController {
         module.getModuleMetadata().setCreatedBy(user);
         if (GOOGLE_PROVIDER.equalsIgnoreCase(module.getMainProvider())) {
             String credentialsFile = ModuleUtil.addSecretFile(module, credentialsLocation);
-            Variable variable =new Variable(CRED_VAR_KEY, null, null, String.format(GOOGLE_PROVIDER_CRED_FORMAT, credentialsFile),
+            Variable variable =new Variable(CRED_VAR_KEY, null, null, credentialsFile,
                     false, false, null);
             module.getVariables().add(variable);
         }
@@ -102,7 +101,7 @@ public class ModuleRestController {
         module.getModuleMetadata().setUpdatedAt(LocalDateTime.now());
         if (GOOGLE_PROVIDER.equalsIgnoreCase(module.getMainProvider())) {
             String credentialsFile = ModuleUtil.addSecretFile(module, credentialsLocation);
-            Variable variable =new Variable(CRED_VAR_KEY, null, null, String.format(GOOGLE_PROVIDER_CRED_FORMAT, credentialsFile),
+            Variable variable =new Variable(CRED_VAR_KEY, null, null, credentialsFile,
                     false, false, null);
             module.getVariables().add(variable);
         }
