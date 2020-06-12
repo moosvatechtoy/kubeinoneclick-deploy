@@ -12,9 +12,9 @@ import java.util.Base64;
 public class ModuleUtil {
     private static final Logger LOG = LoggerFactory.getLogger(ModuleUtil.class);
     private static  final String CREDENTIALS_PATH = "%s/%s";
-    private static  final String CREDENTIALS_FILE = "/credential";
+    private static  final String CREDENTIALS_FILE = "/account.json";
 
-    public static void addSecretFile(TerraformModule terraformModule, String credentialsLocation) {
+    public static String addSecretFile(TerraformModule terraformModule, String credentialsLocation) {
         String credentialsFilePath = String.format(CREDENTIALS_PATH, credentialsLocation, terraformModule.getMainProvider().toLowerCase());
         FileOutputStream fos = null;
         File credentialsFile = null;
@@ -39,5 +39,6 @@ public class ModuleUtil {
                 LOG.error("Error closing resources", e);
             }
         }
+        return credentialsFile.getAbsolutePath();
     }
 }

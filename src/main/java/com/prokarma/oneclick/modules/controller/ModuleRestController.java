@@ -1,5 +1,6 @@
 package com.prokarma.oneclick.modules.controller;
 
+import com.prokarma.oneclick.modules.bo.Variable;
 import com.prokarma.oneclick.modules.repository.TerraformModuleGitRepository;
 import com.prokarma.oneclick.modules.repository.TerraformModuleRepository;
 import com.prokarma.oneclick.modules.bo.TerraformModule;
@@ -31,6 +32,10 @@ import java.util.UUID;
 @RequestMapping("/api/modules")
 @Secured({"ROLE_USER","ROLE_ADMIN"})
 public class ModuleRestController {
+
+    private static  final String GOOGLE_PROVIDER = "GOOGLE";
+    private static  final String GOOGLE_PROVIDER_CRED_FORMAT = "${file(\"%s\")}";
+    private static  final String CRED_VAR_KEY = "credentials";
 
     private TerraformModuleRepository moduleRepository;
 
@@ -77,7 +82,12 @@ public class ModuleRestController {
     public TerraformModule createModule(@RequestBody TerraformModule module, User user){
         module.setId(UUID.randomUUID().toString());
         module.getModuleMetadata().setCreatedBy(user);
-        ModuleUtil.addSecretFile(module, credentialsLocation);
+        if (GOOGLE_PROVIDER.equalsIgnoreCase(module.getMainProvider())) {
+            String credentialsFile = ModuleUtil.addSecretFile(module, credentialsLocation);
+            Variable variable =new Variable(CRED_VAR_KEY, null, null, String.format(GOOGLE_PROVIDER_CRED_FORMAT, credentialsFile),
+                    false, false, null);
+            module.getVariables().add(variable);
+        }
         return moduleRepository.save(module);
     }
 
@@ -90,7 +100,13 @@ public class ModuleRestController {
 
         module.getModuleMetadata().setUpdatedBy(user);
         module.getModuleMetadata().setUpdatedAt(LocalDateTime.now());
-        ModuleUtil.addSecretFile(module, credentialsLocation);
+        if (GOOGLE_PROVIDER.equalsIgnoreCase(module.getMainProvider())) {
+            String credentialsFile = ModuleUtil.addSecretFile(module, credentialsLocation);
+            Variable variable =new Variable(CRED_VAR_KEY, null, null, String.format(GOOGLE_PROVIDER_CRED_FORMAT, credentialsFile),
+                    false, false, null);
+            module.getVariables().add(variable);
+        }
+
         return moduleRepository.save(module);
     }
 

@@ -26,7 +26,7 @@
           <!-- <p v-if="module.estimatedMonthlyCost">
             Estimated monthly cost :
             <b-badge variant="info">{{ module.estimatedMonthlyCost }} $</b-badge>
-          </p> -->
+          </p>-->
         </b-card-text>
 
         <b-button
@@ -93,21 +93,21 @@ export default {
   methods: {
     async deleteModule(moduleId) {
       await deleteModule(moduleId)
-          .then(() => {
-            displayNotification(this, {
-              message: "Module deleted",
-              variant: "success"
-            });
-            let index = this.modules.findIndex(item => item.id === moduleId);
-            this.modules.splice(index, 1);
+        .then(() => {
+          displayNotification(this, {
+            message: "Module deleted",
+            variant: "success"
+          });
+          let index = this.modules.findIndex(item => item.id === moduleId);
+          this.modules.splice(index, 1);
+        })
+        .catch(({ error, message }) =>
+          displayNotification(this, {
+            title: error,
+            message,
+            variant: "danger"
           })
-          .catch(({ error, message }) =>
-            displayNotification(this, {
-              title: error,
-              message,
-              variant: "danger"
-            })
-          );
+        );
     },
     createStack(moduleId) {
       this.$router.push({

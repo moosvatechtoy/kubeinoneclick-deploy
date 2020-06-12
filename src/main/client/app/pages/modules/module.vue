@@ -22,6 +22,7 @@
                 :show-labels="false"
                 required
                 :options="['AWS','AZURE', 'GOOGLE', 'ONPREM']"
+                @select="onProviderChange"
               />
               <b-form-invalid-feedback>This field is mandatory</b-form-invalid-feedback>
             </b-form-group>
@@ -131,7 +132,11 @@
           @removeVar="removeVar"
         />
 
-        <b-form-group label="Credentials" description="The sercret key of cloud provider">
+        <b-form-group
+          v-if="module.mainProvider === 'GOOGLE'"
+          label="Google Service Credentials"
+          description="Google service account key in json format"
+        >
           <b-form-textarea v-model="module.secretKey" @change="encodeCredentials()" />
         </b-form-group>
 
@@ -153,6 +158,7 @@ import {
 } from "@/shared/api/modules-api";
 import { getTeams } from "@/shared/api/teams-api";
 import { displayNotification } from "@/shared/services/modal-service";
+import { VARIABLES } from "@/shared/constants/variable";
 
 export default {
   name: "AppModule",
@@ -209,21 +215,15 @@ export default {
         repository: "hashicorp/terraform",
         tag: "latest"
       };
-      dataModule.variables = [
-        { name: "aws_region_name", editable: true },
-        { name: "cluster-name", defaultValue: "", editable: true },
-        { name: "desired_size", defaultValue: "", editable: true },
-        { name: "instance_types", defaultValue: "", editable: true },
-        { name: "max_size", defaultValue: "", editable: true },
-        { name: "min_size", defaultValue: "", editable: true },
-        { name: "vpc_cidr_block", defaultValue: "", editable: true },
-        { name: "vpc_subnet", defaultValue: "", editable: true }
-      ];
+      dataModule.variables = Object.assign([], VARIABLES['AWS']);
       dataModule.moduleMetadata = {};
       this.module = await dataModule;
       this.isCreate = true;
     } else {
       this.module = await getModule(this.moduleId);
+      if (this.module.mainProvider === 'GOOGLE') {
+        this.module.variables = this.module.variables.filter(item => item.name !== 'credentials');
+      }
       this.isCreate = false;
     }
     this.teams = await getTeams();
@@ -235,7 +235,15 @@ export default {
         typeof field !== "undefined" && field !== null && field.trim() !== ""
       );
     },
+    onProviderChange(provider) {
+      if (provider) {
+        this.module.variables = Object.assign([], VARIABLES[provider]);
+      }
+    },
     async save() {
+      this.module.secretKey = this.notEmpty(this.module.secretKey)
+        ? this.module.secretKey
+        : " ";
       if (this.isCreate) {
         await createModule(this.module)
           .then(() => {

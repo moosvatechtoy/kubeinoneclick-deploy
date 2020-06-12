@@ -64,9 +64,11 @@ public class StackCommandBuilder {
                 .setExternalUrl(settings.getExternalUrl())
                 .setStateApiUser(stateApiSecurityProperties.getUsername())
                 .setStateApiPassword(stateApiSecurityProperties.getPassword())
-                .setStackId(stack.getId())
-                .setTerraformImage(job.getTerraformImage().image());
+                .setStackId(stack.getId());
 
+        if (module.isRemoteRun()) {
+            script.setTerraformImage(module.getTerraformImage().image());
+        }
         if (StringUtils.isNotBlank(module.getDirectory())) {
             script.setGitDirectory(module.getDirectory());
         }
