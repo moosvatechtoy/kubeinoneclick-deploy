@@ -12,8 +12,7 @@ export const VARIABLES = {
     ],
     GOOGLE : [
         { name: "project", editable: false },
-        { name: "region", defaultValue: "", editable: false },
-        { name: "zone", defaultValue: "", editable: false }
+        { name: "region", defaultValue: "", editable: false }
     ],
     ONPREM : [
         { name: "username", editable: false },

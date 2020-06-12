@@ -129,7 +129,8 @@
       this.stack = {};
       this.stack.moduleId = this.module.id;
       this.stack.variableValues = {};
-      this.stack.variables = this.module.variables.map((variable) => ({
+      let variables = this.module.variables.filter(item => item.name !== 'credentials');
+      this.stack.variables = variables.map((variable) => ({
         ...variable,
         value: variable.defaultValue || '',
         isValid: true,
@@ -148,6 +149,16 @@
         this.stack.variables.forEach((variable) => {
           this.stack.variableValues[variable.name] = variable.value;
         });
+        let credentialVariables = this.module.variables.filter(item => item.name === 'credentials');
+        if (credentialVariables && credentialVariables.length > 0) {
+          let variable = {
+            ...credentialVariables[0],
+            value: credentialVariables[0].defaultValue,
+            isValid: true
+          };
+          this.stack.variables.push(variable);
+          this.stack.variableValues['credentials'] = credentialVariables[0].defaultValue;
+        }
       },
       async saveStack() {
         this.stackVariablesMgmt();

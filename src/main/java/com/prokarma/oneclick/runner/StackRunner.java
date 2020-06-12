@@ -129,7 +129,7 @@ public class StackRunner {
 
         // get the wanted script
         var script = scriptFn.get();
-        LOG.debug("Running Stack Script===>>>" + script);
+        LOG.error("Running Stack Script===>>>" + script);
         int result = 0;
         if (module.isRemoteRun()) {
             result = this.dockerRunner.runContainerForJob(jobWorkflow, script);
