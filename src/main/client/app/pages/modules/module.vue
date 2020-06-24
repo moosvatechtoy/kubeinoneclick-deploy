@@ -1,32 +1,53 @@
 <template>
   <div v-if="module" class="block">
     <div class="block_head">
-      <h2>Template {{ module.name }}</h2>
+      <h2>Configuration {{ module.name }}</h2>
     </div>
 
     <div class="block_content">
       <form>
         <b-form-row>
-          <b-col>
-            <b-form-group label="Name" description="The name of your Template">
+          <b-col cols="3">
+            <b-form-group label="Name" description="The name of your Configuration">
               <b-input id="module.name" v-model="module.name" :state="notEmpty(module.name)" />
               <b-form-invalid-feedback>This field is mandatory</b-form-invalid-feedback>
             </b-form-group>
           </b-col>
-          <b-col cols="4">
+          <b-col cols="2">
             <b-form-group label="Provider">
-            <vue-multiselect
-              v-model="module.mainProvider"
-              searchable
-              placeholder="Select Provider"
-              :show-labels="false"
-              :options="['AWS','AZURE', 'GOOGLE', 'ONPREM']"
-            />
-            <b-form-invalid-feedback>This field is mandatory</b-form-invalid-feedback>
+              <vue-multiselect
+                v-model="module.mainProvider"
+                searchable
+                placeholder="Select Provider"
+                :show-labels="false"
+                required
+                :options="['AWS','AZURE', 'GOOGLE', 'ONPREM']"
+                @select="onProviderChange"
+              />
+              <b-form-invalid-feedback>This field is mandatory</b-form-invalid-feedback>
+            </b-form-group>
+          </b-col>
+          <b-col cols="2">
+            <b-form-checkbox
+              style="margin-top: 30px;"
+              v-model="module.remoteRun"
+              name="remoteRun-button"
+              switch
+            >Container</b-form-checkbox>
+          </b-col>
+          <b-col cols="4" v-if="!module.remoteRun">
+            <b-form-group label="Terraform Path" description="Terraform installed location">
+              <b-input
+                id="module.terraformPath"
+                v-model="module.terraformPath"
+                :state="notEmpty(module.terraformPath)"
+              />
+              <b-form-invalid-feedback>Terraform Location is mandatory</b-form-invalid-feedback>
             </b-form-group>
           </b-col>
           <b-col :md="isTerraformImageOverride ? '5' : '3'">
             <app-terraform-image-input
+              v-if="module.remoteRun"
               :image="module.terraformImage"
               @form-status="isTerraformImageValid = $event"
               @override-status="isTerraformImageOverride = $event"
@@ -34,34 +55,25 @@
           </b-col>
         </b-form-row>
 
-        <b-form-group label="Description" description="The description of your Template">
+        <b-form-group label="Description" description="The description of your Configuration">
           <b-form-textarea v-model="module.description" />
         </b-form-group>
 
-        <!-- <b-form-row>
-          <b-col cols="3">
-            <b-form-group label="Estimated monthly cost">
-              <b-input-group append="$">
-                <b-form-input v-model="module.estimatedMonthlyCost" />
-              </b-input-group>
-            </b-form-group>
+        <b-form-row>
+          <b-col cols="2">
+            <b-form-checkbox
+              style="margin-top: 10px; margin-bottom: 10px;"
+              v-model="module.remoteCode"
+              name="remoteRun-button"
+              switch
+            >Git Repository</b-form-checkbox>
           </b-col>
         </b-form-row>
-
-        <b-form-group label="Description of estimated monthly cost">
-          <b-input-group>
-            <b-input-group-text slot="append">
-              <font-awesome-icon :icon="['fab', 'markdown']" />
-            </b-input-group-text>
-            <b-form-textarea v-model="module.estimatedMonthlyCostDescription" />
-          </b-input-group>
-        </b-form-group>-->
-
         <b-form-row>
-          <b-col>
+          <b-col v-if="module.remoteCode">
             <b-form-group
               label="Git Repository URL"
-              description="The URL of the Template's git repository"
+              description="The URL of the Configuration's git repository"
             >
               <b-input
                 v-model="module.gitRepositoryUrl"
@@ -70,12 +82,20 @@
               <b-form-invalid-feedback>This field is mandatory</b-form-invalid-feedback>
             </b-form-group>
           </b-col>
-          <b-col>
+          <b-col v-if="module.remoteCode">
             <b-form-group
               label="Git repository directory"
-              description="The sub-directory of the Template's code inside the repository (leave empty if root)"
+              description="The sub-directory of the Configuration's code inside the repository (leave empty if root)"
             >
               <b-input v-model="module.directory" />
+            </b-form-group>
+          </b-col>
+          <b-col v-if="!module.remoteCode">
+            <b-form-group
+              label="Local repository directory"
+              description="The local directory of the Configuration's code"
+            >
+              <b-input v-model="module.localCodeLocation" />
             </b-form-group>
           </b-col>
         </b-form-row>
@@ -112,7 +132,15 @@
           @removeVar="removeVar"
         />
 
-        <b-button variant="primary" :disabled="!formValid" @click="save">
+        <b-form-group
+          v-if="module.mainProvider === 'GOOGLE'"
+          label="Google Service Credentials"
+          description="Google service account key in json format"
+        >
+          <b-form-textarea v-model="module.secretKey" @change="encodeCredentials()" />
+        </b-form-group>
+
+        <b-button variant="success" :disabled="!formValid" @click="save">
           <font-awesome-icon icon="save" />Save
         </b-button>
       </form>
@@ -130,6 +158,7 @@ import {
 } from "@/shared/api/modules-api";
 import { getTeams } from "@/shared/api/teams-api";
 import { displayNotification } from "@/shared/services/modal-service";
+import { VARIABLES } from "@/shared/constants/variable";
 
 export default {
   name: "AppModule",
@@ -158,11 +187,17 @@ export default {
   computed: {
     formValid() {
       return (
-        [this.module.name, this.module.mainProvider, this.module.gitRepositoryUrl].every(this.notEmpty) &&
+        [
+          this.module.name,
+          this.module.mainProvider,
+          this.module.remoteCode
+            ? this.module.gitRepositoryUrl
+            : this.module.localCodeLocation
+        ].every(this.notEmpty) &&
         this.module.variables
           .map(variable => variable.name)
           .every(this.notEmpty) &&
-        this.isTerraformImageValid
+        (module.remoteRun ? this.isTerraformImageValid : true)
       );
     }
   },
@@ -170,26 +205,25 @@ export default {
   async created() {
     console.log(this.moduleId);
     if (this.moduleId === "ADD") {
-      this.module = {};
-      this.module.moduleMetadata = {};
-      this.module.terraformImage = {
+      let dataModule = {};
+      dataModule.moduleMetadata = {};
+      dataModule.remoteRun = false;
+      dataModule.remoteCode = true;
+      dataModule.terraformPath = "/usr/local/terraform";
+      dataModule.mainProvider = "AWS";
+      dataModule.terraformImage = {
         repository: "hashicorp/terraform",
         tag: "latest"
       };
-      this.module.variables = [
-        { name: "aws_region_name", editable: true },
-        { name: "cluster-name", defaultValue: "", editable: true },
-        { name: "desired_size", defaultValue: "", editable: true },
-        { name: "instance_types", defaultValue: "", editable: true },
-        { name: "max_size", defaultValue: "", editable: true },
-        { name: "min_size", defaultValue: "", editable: true },
-        { name: "vpc_cidr_block", defaultValue: "", editable: true },
-        { name: "vpc_subnet", defaultValue: "", editable: true }
-      ];
-      this.module.moduleMetadata = {};
+      dataModule.variables = Object.assign([], VARIABLES['AWS']);
+      dataModule.moduleMetadata = {};
+      this.module = await dataModule;
       this.isCreate = true;
     } else {
       this.module = await getModule(this.moduleId);
+      if (this.module.mainProvider === 'GOOGLE') {
+        this.module.variables = this.module.variables.filter(item => item.name !== 'credentials');
+      }
       this.isCreate = false;
     }
     this.teams = await getTeams();
@@ -201,12 +235,20 @@ export default {
         typeof field !== "undefined" && field !== null && field.trim() !== ""
       );
     },
+    onProviderChange(provider) {
+      if (provider) {
+        this.module.variables = Object.assign([], VARIABLES[provider]);
+      }
+    },
     async save() {
+      this.module.secretKey = this.notEmpty(this.module.secretKey)
+        ? this.module.secretKey
+        : " ";
       if (this.isCreate) {
         await createModule(this.module)
           .then(() => {
             displayNotification(this, {
-              message: "Template created",
+              message: "Configuration created",
               variant: "success"
             });
             this.$router.push({ name: "modules", params: {} });
@@ -222,7 +264,7 @@ export default {
         await updateModule(this.module)
           .then(() => {
             displayNotification(this, {
-              message: "Template saved",
+              message: "Configuration saved",
               variant: "success"
             });
             this.$router.push({ name: "modules", params: {} });
@@ -244,6 +286,12 @@ export default {
     },
     addVar() {
       this.module.variables.push({});
+    },
+    encodeCredentials() {
+      let base64 = /^([A-Za-z0-9+/]{4})*([A-Za-z0-9+/]{4}|[A-Za-z0-9+/]{3}=|[A-Za-z0-9+/]{2}==)$/;
+      if (!base64.test(this.module.secretKey)) {
+        this.module.secretKey = btoa(this.module.secretKey);
+      }
     }
   }
 };

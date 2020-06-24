@@ -5,6 +5,7 @@ module.exports = {
   css: {
     sourceMap: true,
   },
+  lintOnSave: false,
   publicPath: '/',
   outputDir: 'src/main/resources/public',
   assetsDir: 'assets',

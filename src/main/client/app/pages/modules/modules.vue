@@ -4,27 +4,17 @@
       <b-col cols="10">
         <b-button
           :to="{ name: 'module', params: { moduleId: 'ADD' }}"
-          title="Add Template"
+          title="Add Configuration"
           variant="success"
           class="mb-4"
         >
-          <font-awesome-icon icon="plus" />Add Template
+          <font-awesome-icon icon="plus" />Add Configuration
         </b-button>
-      </b-col>
-      <b-col cols="2">
-        <vue-multiselect
-          v-model="provider"
-          searchable
-          placeholder="Select Provider"
-          :show-labels="false"
-          :options="['', 'AWS','AZURE', 'GOOGLE', 'ONPREM']"
-          @select="onProviderSelect"
-        />
       </b-col>
     </b-form-row>
 
     <b-card-group columns>
-      <b-card v-for="module in filteredModules" :key="module.id" :title="module.name" class="moduleCard">
+      <b-card v-for="module in modules" :key="module.id" :title="module.name" class="moduleCard">
         <b-card-text>
           <app-cli-badge
             :cli="module.terraformImage"
@@ -36,12 +26,12 @@
           <!-- <p v-if="module.estimatedMonthlyCost">
             Estimated monthly cost :
             <b-badge variant="info">{{ module.estimatedMonthlyCost }} $</b-badge>
-          </p> -->
+          </p>-->
         </b-card-text>
 
         <b-button
           :to="{ name: 'module', params: { moduleId: module.id }}"
-          title="Edit this Template"
+          title="Edit this Configuration"
           variant="primary"
           class="mr-1"
         >
@@ -50,7 +40,7 @@
 
         <b-button
           :to="{ name: 'module_description', params: { moduleId: module.id }}"
-          title="Detail of this Template"
+          title="Detail of this Configuration"
           variant="primary"
           class="mr-1"
         >
@@ -58,7 +48,7 @@
         </b-button>
 
         <b-button
-          title="Run this Template"
+          title="Run this Configuration"
           variant="primary"
           class="mr-1"
           @click="createStack(module.id)"
@@ -67,10 +57,10 @@
         </b-button>
 
         <b-button
-          title="Delete this Template"
+          title="Delete this Configuration"
           variant="danger"
           class="mr-1"
-          @click="createStack(module.id)"
+          @click="deleteModule(module.id)"
         >
           <font-awesome-icon :icon="['far', 'trash-alt']" />
         </b-button>
@@ -80,8 +70,8 @@
 </template>
 
 <script>
-import { getModules } from "@/shared/api/modules-api";
-
+import { getModules, deleteModule } from "@/shared/api/modules-api";
+import { displayNotification } from "@/shared/services/modal-service";
 import { AppCliBadge } from "@/shared/components";
 
 export default {
@@ -92,18 +82,33 @@ export default {
 
   data: function data() {
     return {
-      filteredModules: [],
-      modules: [],
-      provider: "AWS"
+      modules: []
     };
   },
 
   async created() {
     this.modules = await getModules();
-    this.filteredModules = this.modules.filter(item => item.mainProvider === 'AWS');
   },
 
   methods: {
+    async deleteModule(moduleId) {
+      await deleteModule(moduleId)
+        .then(() => {
+          displayNotification(this, {
+            message: "Module deleted",
+            variant: "success"
+          });
+          let index = this.modules.findIndex(item => item.id === moduleId);
+          this.modules.splice(index, 1);
+        })
+        .catch(({ error, message }) =>
+          displayNotification(this, {
+            title: error,
+            message,
+            variant: "danger"
+          })
+        );
+    },
     createStack(moduleId) {
       this.$router.push({
         name: "stack_creation",
@@ -111,13 +116,6 @@ export default {
           moduleId
         }
       });
-    },
-    onProviderSelect(provider) {
-      if (provider !== '') {
-        this.filteredModules = this.modules.filter(item => item.mainProvider === provider);
-      } else {
-        this.filteredModules = this.modules;
-      }
     }
   }
 };

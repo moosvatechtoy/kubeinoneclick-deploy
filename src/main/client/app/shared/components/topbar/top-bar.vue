@@ -6,9 +6,10 @@
     <b-navbar-brand :to="{ name: 'home' }">
       <img
         class="img-responsive logo"
-        src="https://13zmfmnuenq8wqpf1ttwov16-wpengine.netdna-ssl.com/wp-content/uploads/2019/12/PK-Red.png"
+        src="@/assets/images/PK-Red.png"
         alt="#"
       >
+      <span class="product-title">OneClick</span>
     </b-navbar-brand>
 
     <b-navbar-nav class="ml-auto">
@@ -40,6 +41,13 @@
 
   .logo {
     height: 50px;
-    margin: 0 15px;
+    margin: 0 0 0 15px;
+  }
+
+  .product-title {
+    font-weight: 600;
+    font-size: 23px;
+    line-height: 35px;
+    color: #014361;
   }
 </style>

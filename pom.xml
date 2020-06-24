@@ -10,34 +10,13 @@
         <relativePath/>
     </parent>
 
-    <groupId>io.codeka</groupId>
-    <artifactId>gaia</artifactId>
+    <groupId>com.prokarma</groupId>
+    <artifactId>oneclick</artifactId>
     <version>2.0.0</version>
     <packaging>jar</packaging>
 
-    <name>gaia</name>
-    <description>gaia runs yours terraform modules</description>
-    <url>https://github.com/gaia-app/gaia</url>
-    <inceptionYear>2019</inceptionYear>
-
-    <licenses>
-        <license>
-            <name>Mozilla Public License Version 2.0</name>
-            <url>http://mozilla.org/MPL/2.0/</url>
-        </license>
-    </licenses>
-
-    <scm>
-        <url>https://github.com/gaia-app/gaia</url>
-    </scm>
-    <issueManagement>
-        <system>github</system>
-        <url>https://github.com/gaia-app/gaia/issues</url>
-    </issueManagement>
-    <ciManagement>
-        <system>travis-ci</system>
-        <url>https://travis-ci.com/gaia-app/gaia</url>
-    </ciManagement>
+    <name>oneclick</name>
+    <description>oneclick runs yours terraform modules</description>
 
     <properties>
         <antlr4.version>4.8-1</antlr4.version>
@@ -49,10 +28,6 @@
         <node.version>v12.16.0</node.version>
         <npm.version>6.13.4</npm.version>
         <frontend-maven-plugin.version>1.10.0</frontend-maven-plugin.version>
-
-        <sonar.projectKey>gaia-app:gaia</sonar.projectKey>
-        <sonar.organization>gaia-app</sonar.organization>
-        <sonar.host.url>https://sonarcloud.io/</sonar.host.url>
     </properties>
 
     <dependencies>

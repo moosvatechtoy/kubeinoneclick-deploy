@@ -5,8 +5,8 @@ const modulesRoutes = [
     component: () => import(/* webpackChunkName: "chunk-modules" */ '@/pages/modules/modules.vue'),
     meta: {
       authorities: ['ROLE_USER'],
-      breadcrumb: [{ text: 'Templates' }],
-      title: 'OneClick - Templates',
+      breadcrumb: [{ text: 'Configurations' }],
+      title: 'OneClick - Configurations',
     },
   },
   {
@@ -15,8 +15,8 @@ const modulesRoutes = [
     component: () => import(/* webpackChunkName: "chunk-modules" */ '@/pages/modules/module-import.vue'),
     meta: {
       authorities: ['ROLE_USER'],
-      breadcrumb: [{ text: 'Templates', to: { name: 'modules' } }, { text: 'Template import' }],
-      title: 'OneClick - Templates import',
+      breadcrumb: [{ text: 'Configurations', to: { name: 'modules' } }, { text: 'Configuration import' }],
+      title: 'OneClick - Configurations import',
     },
   },
   {
@@ -26,8 +26,8 @@ const modulesRoutes = [
     props: true,
     meta: {
       authorities: ['ROLE_USER'],
-      breadcrumb: [{ text: 'Templates', to: { name: 'modules' } }, { text: 'Template edition' }],
-      title: 'OneClick - Template edition',
+      breadcrumb: [{ text: 'Configurations', to: { name: 'modules' } }, { text: 'Configuration edition' }],
+      title: 'OneClick - Configuration edition',
     },
   },
   {
@@ -37,8 +37,8 @@ const modulesRoutes = [
     props: true,
     meta: {
       authorities: ['ROLE_USER'],
-      breadcrumb: [{ text: 'Templates', to: { name: 'modules' } }, { text: 'Template details' }],
-      title: 'OneClick - Template description',
+      breadcrumb: [{ text: 'Configurations', to: { name: 'modules' } }, { text: 'Configuration details' }],
+      title: 'OneClick - Configuration description',
     },
   },
 ];

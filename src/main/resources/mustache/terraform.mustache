@@ -1,11 +1,21 @@
 set -e
 
+{{#terraformImage}}
 echo 'using image {{terraformImage}}'
+{{/terraformImage}}
 
+rm -rf module || true
+
+{{#gitRepositoryUrl}}
 echo 'cloning {{gitRepositoryUrl}}' | awk '{ sub(/oauth2:(.*)@/, "oauth2:[MASKED]@");}1'
 git clone {{gitRepositoryUrl}} module
-
 cd module
+{{/gitRepositoryUrl}}
+
+{{#localDirectory}}
+cd {{localDirectory}}
+{{/localDirectory}}
+
 {{#gitDirectory}}
     cd {{gitDirectory}}
 {{/gitDirectory}}

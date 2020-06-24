@@ -3,8 +3,8 @@
     <div class="wrap-login">
       <div class="login-pic">
         <img
-          src="https://13zmfmnuenq8wqpf1ttwov16-wpengine.netdna-ssl.com/wp-content/uploads/2019/12/PK-Red.png"
-          alt="gaia-logo"
+          src="@/assets/images/PK-Red.png"
+          alt="oneclick-logo"
         >
       </div>
 
@@ -109,7 +109,7 @@
     align-items: center;
     padding: 15px;
     background: white;
-    background: linear-gradient(-135deg, #C70001, #fff);
+    background-image: url('~@/assets/images/shipping-containers.jpg');
   }
 
   .wrap-login {
@@ -140,7 +140,8 @@
 
   .login-form-title {
     font-size: 24px;
-    color: #333333;
+    font-weight: 600;
+    color: #014361;
     line-height: 1.2;
     text-align: center;
     width: 100%;
@@ -158,7 +159,7 @@
   .input {
     font-size: 15px;
     line-height: 1.5;
-    color: #666666;
+    color: #202B34;
     display: block;
     width: 100%;
     background: #e6e6e6;

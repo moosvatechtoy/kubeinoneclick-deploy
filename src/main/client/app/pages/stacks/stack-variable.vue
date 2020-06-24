@@ -7,6 +7,7 @@
       v-if="! isListRegex"
       v-model="editableValue"
       :state="validAndEmit().result"
+      :type="['secret_key', 'client_secret', 'password'].includes(name) ? 'password' : 'text'"
       trim
       @input="$emit('input', editableValue)"
     />

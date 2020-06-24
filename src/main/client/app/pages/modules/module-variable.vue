@@ -3,7 +3,7 @@
     <b-col cols="3">
       <b-form-group label="Name">
         <b-input
-          v-model="variable.name"
+          v-model="variable.name" 
           :state="notEmpty(variable.name)"
         />
         <b-form-invalid-feedback class="position-absolute">
@@ -18,7 +18,7 @@
     </b-col>
     <b-col cols="2">
       <b-form-group label="Default value">
-        <b-input v-model="variable.defaultValue" />
+        <b-input v-model="variable.defaultValue" :type="['secret_key', 'client_secret', 'password'].includes(variable.name) ? 'password' : 'text'"/>
       </b-form-group>
     </b-col>
     <b-col

@@ -1,36 +1,45 @@
 <template>
   <div>
     <b-form-row>
-      <b-col cols="4">
-        <b-form-group description="The Template to create Provisioner">
-        <vue-multiselect
-          v-model="moduleId"
-          label="name"
-          track-by="id"
-          searchable
-          placeholder="Select Template"
-          :options="modules"
-          :show-labels="false"
-          @select="onModuleSelect"
-        />
-        </b-form-group>
-      </b-col>
-      <b-col cols="4">
+      <b-col cols="7">
         <b-button
           title="Add Provisioner"
           variant="success"
           class="mb-4"
-          :disabled="!moduleId"
-          @click="createStack()"
+          v-b-modal.modal-prevent-closing
         >
           <font-awesome-icon icon="plus" />Add Provisioner
         </b-button>
+      </b-col>
+      <b-col cols="3">
+        <vue-multiselect
+          v-model="provider"
+          id="provider-input"
+          label="name"
+          track-by="id"
+          searchable
+          placeholder="Select Provider"
+          :options="modules"
+          :show-labels="false"
+          @select="onProviderSelect"
+          @Remove="onProviderRemove"
+        />
+      </b-col>
+      <b-col cols="2">
+        <vue-multiselect
+          v-model="status"
+          searchable
+          placeholder="Select Status"
+          :show-labels="false"
+          :options="['NEW', 'RUNNING']"
+          @select="onStatusSelect"
+        />
       </b-col>
     </b-form-row>
 
     <b-card-group columns>
       <b-card
-        v-for="stack in stacks"
+        v-for="stack in filteredStacks"
         :key="stack.id"
         :title="stack.name"
         :sub-title="stack.description"
@@ -51,21 +60,72 @@
         >
           <font-awesome-icon icon="edit" />
         </b-button>
+        <b-button
+          title="Delete this Provisioner"
+          variant="danger"
+          class="mr-1"
+          @click="deleteStack(stack.id)"
+        >
+          <font-awesome-icon :icon="['far', 'trash-alt']" />
+        </b-button>
       </b-card>
     </b-card-group>
+
+    <b-modal
+      id="modal-prevent-closing"
+      ref="modal"
+      title="Select Provider"
+      okVariant="success"
+      @show="resetModal"
+      @hidden="resetModal"
+      @ok="handleOk"
+    >
+      <form ref="form" @submit.stop.prevent="handleSubmit">
+        <b-form-group
+          :state="templateState"
+          description="The Provider to create Provisioner"
+          label-for="template-input"
+          invalid-feedback="Provider is required to create Provisioner"
+        >
+        <vue-multiselect
+          v-model="moduleId"
+          id="template-input"
+          label="name"
+          track-by="id"
+          searchable
+          placeholder="Select Provider"
+          :options="modules"
+          :show-labels="false"
+          :state="templateState"
+          required
+        />
+        </b-form-group>
+      </form>
+    </b-modal>
   </div>
 </template>
 
 <script>
-import { getStacks } from "@/shared/api/stacks-api";
+import { getStacks, deleteStack } from "@/shared/api/stacks-api";
+import { displayNotification } from "@/shared/services/modal-service";
 import { getModules } from "@/shared/api/modules-api";
 
 export default {
   name: "AppStacks",
+  props: {
+      moduleParam: {
+        type: String,
+        required: false
+      },
+    },
   data: () => ({
+    templateState: null,
     stacks: [],
+    filteredStacks: [],
     modules: [],
     moduleId: "",
+    provider: '',
+    status: '',
     states: {
       NEW: {
         variant: "success",
@@ -94,8 +154,15 @@ export default {
     }
   }),
   async created() {
-    this.stacks = await getStacks();
     this.modules = await getModules();
+    this.stacks = await getStacks();
+    if (this.moduleParam) {
+      let moduleFiltered = this.modules.filter(item => item.name === this.moduleParam);
+      if (moduleFiltered && moduleFiltered.length > 0) {
+        this.provider = moduleFiltered[0];
+      }
+    }
+    this.onProviderSelect(this.provider);
   },
 
   methods: {
@@ -108,9 +175,67 @@ export default {
         }
       });
     },
-    onModuleSelect(module) {
-      this.moduleId = module.id;
-    }
+    async deleteStack(stackId) {
+      await deleteStack(stackId)
+          .then(() => {
+            displayNotification(this, {
+              message: "Stack deleted",
+              variant: "success"
+            });
+            let index = this.stacks.findIndex(item => item.id === stackId);
+            this.stacks.splice(index, 1);
+          })
+          .catch(({ error, message }) =>
+            displayNotification(this, {
+              title: error,
+              message,
+              variant: "danger"
+            })
+          );
+    },
+    onProviderSelect(provider) {
+      this.filterByProviderAndStatus(provider, this.status)
+    },
+    onStatusSelect(status) {
+      this.filterByProviderAndStatus(this.provider, status)
+    },
+    filterByProviderAndStatus(provider, status) {
+      let items = this.stacks;
+      if (provider !== '') { 
+        items = items.filter(item => item.moduleId === provider.id);
+      }
+
+      if (status !== '') { 
+        items = items.filter(item => item.state === status);
+      }
+      this.filteredStacks = items;
+    },
+    onProviderRemove(provider) {
+      this.filteredStacks = this.stacks;
+    },
+    checkFormValidity() {
+        const valid = this.moduleId !== '';
+        this.templateState = valid;
+        return valid;
+      },
+      resetModal() {
+        this.templateState = null;
+        this.moduleId = '';
+      },
+      handleOk(bvModalEvt) {
+        bvModalEvt.preventDefault();
+        this.handleSubmit();
+      },
+      handleSubmit() {
+        if (!this.checkFormValidity()) {
+          return;
+        } else {
+          this.createStack();
+        }
+        this.$nextTick(() => {
+          this.$bvModal.hide('modal-prevent-closing')
+        })
+      }
   }
 };
 </script>
