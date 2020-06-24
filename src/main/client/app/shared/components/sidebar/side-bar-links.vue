@@ -27,20 +27,20 @@
     data: () => ({
       entries: [
         {
-          route: 'dashboard', icon: 'tachometer-alt', class: 'yellow_color', title: 'Dashboard', roles: ['ROLE_USER'],
+          route: 'dashboard', icon: 'tachometer-alt', class: 'eastern-blue-color', title: 'Dashboard', roles: ['ROLE_USER'],
         },
         {
           route: 'stacks', icon: 'layer-group', class: 'blue2_color', title: 'Provisioners', roles: ['ROLE_USER'],
         },
         {
-          route: 'settings', icon: 'cog', class: 'yellow_color', title: 'Settings', roles: ['ROLE_ADMIN'],
-        },
-        {
-          route: 'modules', icon: 'object-group', class: 'blue1_color', title: 'Configurations', roles: ['ROLE_ADMIN'],
+          route: 'modules', icon: 'object-group', class: 'prucian-blue-color', title: 'Configurations', roles: ['ROLE_ADMIN'],
         },
         {
           route: 'users', icon: 'user-friends', class: 'yellow_color', title: 'Users', roles: ['ROLE_ADMIN'],
         },
+        {
+          route: 'settings', icon: 'cog', class: 'red_color', title: 'Settings', roles: ['ROLE_ADMIN'],
+        }
       ],
     }),
     computed: {

@@ -470,12 +470,24 @@ a:focus {
   background: #03a9f4 !important;
 }
 
+.prucian-blue-bg {
+  background: #014361 !important;
+}
+
+.prucian-blue-color {
+  color: #014361 !important;
+}
+
+.green-bg {
+  background: #184a06 !important;
+}
+
 .red_color {
-  color: #e91e63 !important;
+  color: #C70000 !important;
 }
 
 .red_bg {
-  background: #e91e63 !important;
+  background: #C70000 !important;
 }
 
 .yellow_color {
@@ -484,6 +496,10 @@ a:focus {
 
 .yellow_bg {
   background: #ff9800 !important;
+}
+
+.eastern-blue-color {
+  color: #1B83B1 !important;
 }
 
 .purple_color2 {
@@ -3008,4 +3024,8 @@ ul.messenger.messenger-fixed.messenger-on-top.custom-messenger-on-top {
   content: attr(data-select);
   background: #0069d9;
   color: white;
+}
+
+.form-control {
+  color: #202B34 !important;
 }

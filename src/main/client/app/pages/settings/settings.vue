@@ -33,7 +33,7 @@
       />
 
       <b-button
-        variant="primary"
+        variant="success"
         @click="save()"
       >
         <font-awesome-icon icon="save" />

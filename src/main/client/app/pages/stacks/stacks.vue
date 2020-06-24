@@ -1,7 +1,7 @@
 <template>
   <div>
     <b-form-row>
-      <b-col cols="8">
+      <b-col cols="7">
         <b-button
           title="Add Provisioner"
           variant="success"
@@ -11,7 +11,7 @@
           <font-awesome-icon icon="plus" />Add Provisioner
         </b-button>
       </b-col>
-      <b-col cols="2">
+      <b-col cols="3">
         <vue-multiselect
           v-model="provider"
           id="provider-input"
@@ -75,6 +75,7 @@
       id="modal-prevent-closing"
       ref="modal"
       title="Select Provider"
+      okVariant="success"
       @show="resetModal"
       @hidden="resetModal"
       @ok="handleOk"

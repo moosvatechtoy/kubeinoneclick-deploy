@@ -4,7 +4,7 @@
       <div class="col-md-6 col-lg-4 margin_bottom_30">
         <b-overlay :show="loading">
           <app-dashboard-widget
-            class="blue2_bg"
+            class="prucian-blue-bg"
             text="Providers"
             :value="summary.modulesCount"
             icon="object-group"
@@ -26,7 +26,7 @@
       <div class="col-md-6 col-lg-4 margin_bottom_30">
         <b-overlay :show="loading">
           <app-dashboard-widget
-            class="yellow_bg"
+            class="green-bg"
             text="Running Provisioners"
             :value="summary.runningStacksCount"
             icon="caret-square-up"
@@ -34,7 +34,7 @@
           />
         </b-overlay>
       </div>
-      <div class="col-md-6 col-lg-3 margin_bottom_30" v-for="moduleCount in summary.counts" :key="moduleCount.name">
+      <div class="col-md-6 col-lg-4 margin_bottom_30" v-for="moduleCount in summary.counts" :key="moduleCount.name">
         <b-overlay :show="loading">
           <app-dashboard-widget
             class="blue2_bg"
