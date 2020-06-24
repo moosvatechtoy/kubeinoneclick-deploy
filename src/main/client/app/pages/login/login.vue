@@ -140,7 +140,8 @@
 
   .login-form-title {
     font-size: 24px;
-    color: #333333;
+    font-weight: 600;
+    color: #014361;
     line-height: 1.2;
     text-align: center;
     width: 100%;
