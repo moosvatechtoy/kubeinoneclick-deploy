@@ -140,7 +140,7 @@
           <b-form-textarea v-model="module.secretKey" @change="encodeCredentials()" />
         </b-form-group>
 
-        <b-button variant="primary" :disabled="!formValid" @click="save">
+        <b-button variant="success" :disabled="!formValid" @click="save">
           <font-awesome-icon icon="save" />Save
         </b-button>
       </form>
