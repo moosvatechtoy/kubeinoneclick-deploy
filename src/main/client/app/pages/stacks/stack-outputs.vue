@@ -3,7 +3,7 @@
     <div class="block">
       <div class="block_head">
         <h2>Outputs</h2>
-        <small>These are the outputs of your stack.</small>
+        <small>These are the outputs of your Cluster.</small>
       </div>
       <table
         v-if="Object.keys(outputs).length !== 0"

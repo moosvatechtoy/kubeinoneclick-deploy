@@ -1,14 +1,14 @@
 <template>
   <div v-if="module" class="block">
     <div class="block_head">
-      <h2>Configuration {{ module.name }}</h2>
+      <h2>Template {{ module.name }}</h2>
     </div>
 
     <div class="block_content">
       <form>
         <b-form-row>
           <b-col cols="3">
-            <b-form-group label="Name" description="The name of your Configuration">
+            <b-form-group label="Name" description="The name of your Template">
               <b-input id="module.name" v-model="module.name" :state="notEmpty(module.name)" />
               <b-form-invalid-feedback>This field is mandatory</b-form-invalid-feedback>
             </b-form-group>
@@ -55,7 +55,7 @@
           </b-col>
         </b-form-row>
 
-        <b-form-group label="Description" description="The description of your Configuration">
+        <b-form-group label="Description" description="The description of your Template">
           <b-form-textarea v-model="module.description" />
         </b-form-group>
 
@@ -73,7 +73,7 @@
           <b-col v-if="module.remoteCode">
             <b-form-group
               label="Git Repository URL"
-              description="The URL of the Configuration's git repository"
+              description="The URL of the Template's git repository"
             >
               <b-input
                 v-model="module.gitRepositoryUrl"
@@ -85,7 +85,7 @@
           <b-col v-if="module.remoteCode">
             <b-form-group
               label="Git repository directory"
-              description="The sub-directory of the Configuration's code inside the repository (leave empty if root)"
+              description="The sub-directory of the Template's code inside the repository (leave empty if root)"
             >
               <b-input v-model="module.directory" />
             </b-form-group>
@@ -93,7 +93,7 @@
           <b-col v-if="!module.remoteCode">
             <b-form-group
               label="Local repository directory"
-              description="The local directory of the Configuration's code"
+              description="The local directory of the Template's code"
             >
               <b-input v-model="module.localCodeLocation" />
             </b-form-group>
@@ -203,13 +203,12 @@ export default {
   },
 
   async created() {
-    console.log(this.moduleId);
     if (this.moduleId === "ADD") {
       let dataModule = {};
       dataModule.moduleMetadata = {};
       dataModule.remoteRun = false;
       dataModule.remoteCode = true;
-      dataModule.terraformPath = "/usr/local/terraform";
+      dataModule.terraformPath = "/usr/bin/";
       dataModule.mainProvider = "AWS";
       dataModule.terraformImage = {
         repository: "hashicorp/terraform",
@@ -248,7 +247,7 @@ export default {
         await createModule(this.module)
           .then(() => {
             displayNotification(this, {
-              message: "Configuration created",
+              message: "Template created",
               variant: "success"
             });
             this.$router.push({ name: "modules", params: {} });
@@ -264,7 +263,7 @@ export default {
         await updateModule(this.module)
           .then(() => {
             displayNotification(this, {
-              message: "Configuration saved",
+              message: "Template saved",
               variant: "success"
             });
             this.$router.push({ name: "modules", params: {} });

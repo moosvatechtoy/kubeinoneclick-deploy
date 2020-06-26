@@ -4,13 +4,13 @@
     class="block"
   >
     <form-wizard
-      title="Run a new Provisioner"
-      subtitle="Follow the steps to start a new Provisioner"
+      title="Run a new Cluster"
+      subtitle="Follow the steps to start a new Cluster"
       color="#00ab94"
       error-color="#dc3545"
     >
       <tab-content
-        title="Provisioner"
+        title="Cluster"
         :before-change="checkStackNameValidation"
       >
         <h4>{{ module.name }}</h4>
@@ -21,7 +21,7 @@
         <div class="form-group">
           <b-form-group
             label="Name"
-            description="The name of your Provisioner"
+            description="The name of your Cluster"
           >
             <b-input
               v-model="stack.name"
@@ -32,7 +32,7 @@
           </b-form-group>
           <b-form-group
             label="Description"
-            description="The description of your Provisioner"
+            description="The description of your Cluster"
           >
             <b-input v-model="stack.description" />
           </b-form-group>
@@ -53,7 +53,7 @@
       </tab-content>
       <tab-content title="Start">
         <h2>Run</h2>
-        <p>Save your stack or run it !</p>
+        <p>Save your Cluster or run it !</p>
       </tab-content>
 
       <!-- customizing save button -->

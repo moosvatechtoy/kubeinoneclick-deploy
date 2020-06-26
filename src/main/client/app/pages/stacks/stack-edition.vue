@@ -42,7 +42,7 @@
       <div class="col-md-6">
         <div class="block">
           <div class="block_head">
-            <h2>Provisioner {{ stack.name }}</h2>
+            <h2>Cluster {{ stack.name }}</h2>
             <small>{{ stack.description }}</small>
             <div class="metadata">
               <p>
@@ -64,7 +64,7 @@
                 variant="success"
                 pill
                 data-toggle="tooltip"
-                title="Your Provisioner is new and has not been started yet."
+                title="Your Cluster is new and has not been started yet."
               >
                 <i class="fas fa-star-of-life" /> new
               </b-badge>
@@ -73,7 +73,7 @@
                 variant="primary"
                 pill
                 data-toggle="tooltip"
-                title="Your Provisioner is up and running !"
+                title="Your Cluster is up and running !"
               >
                 <i class="far fa-check-square" /> running
               </b-badge>
@@ -82,7 +82,7 @@
                 variant="warning"
                 pill
                 data-toggle="tooltip"
-                title="Your Provisioner needs an update !"
+                title="Your Cluster needs an update !"
               >
                 <i class="fas fa-upload" /> to update
               </b-badge>
@@ -91,7 +91,7 @@
                 variant="danger"
                 pill
                 data-toggle="tooltip"
-                title="Your Provisioner has been stopped."
+                title="Your Cluster has been stopped."
               >
                 <i class="fas fa-stop-circle" /> stopped
               </b-badge>
@@ -110,7 +110,7 @@
                 This field is mandatory.
               </b-form-invalid-feedback>
               <b-form-text id="input-live-help">
-                This is the name of your Provisioner.
+                This is the name of your Cluster.
               </b-form-text>
             </b-form-group>
             <b-form-invalid-feedback id="input-live-feedback">
@@ -248,9 +248,9 @@
           this.stack.variableValues[variable.name] = variable.value;
         });
         saveStack(this.stack)
-          .then(() => displayNotification(this, { variant: 'success', message: 'Provisioner saved.' }))
+          .then(() => displayNotification(this, { variant: 'success', message: 'Cluster saved.' }))
           .catch(({ message }) => {
-            displayNotification(this, { variant: 'info', message: `Error saving Provisioner: ${message}` });
+            displayNotification(this, { variant: 'info', message: `Error saving Cluster: ${message}` });
           });
       },
       async runStack() {
@@ -264,7 +264,7 @@
       },
       async stopStack() {
         // ask for confirmation
-        const message = 'This will completely stop the stack, and destroy all created resources. Continue?';
+        const message = 'This will completely stop the clusters, and destroy all created resources. Continue?';
         if (await displayConfirmDialog(this, { title: 'Stop request', message })) {
           const { jobId } = await destroyStack(this.stack.id);
           this.$router.push({ name: 'job', params: { jobId } });

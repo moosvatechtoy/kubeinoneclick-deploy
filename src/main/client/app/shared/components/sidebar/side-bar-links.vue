@@ -30,17 +30,18 @@
           route: 'dashboard', icon: 'tachometer-alt', class: 'eastern-blue-color', title: 'Dashboard', roles: ['ROLE_USER'],
         },
         {
-          route: 'stacks', icon: 'layer-group', class: 'blue2_color', title: 'Provisioners', roles: ['ROLE_USER'],
+          route: 'stacks', icon: 'layer-group', class: 'blue2_color', title: 'Clusters', roles: ['ROLE_USER'],
         },
         {
-          route: 'modules', icon: 'object-group', class: 'prucian-blue-color', title: 'Configurations', roles: ['ROLE_ADMIN'],
+          route: 'modules', icon: 'object-group', class: 'prucian-blue-color', title: 'Templates', roles: ['ROLE_ADMIN'],
         },
         {
           route: 'users', icon: 'user-friends', class: 'yellow_color', title: 'Users', roles: ['ROLE_ADMIN'],
-        },
-        {
-          route: 'settings', icon: 'cog', class: 'red_color', title: 'Settings', roles: ['ROLE_ADMIN'],
         }
+        // ,
+        // {
+        //   route: 'settings', icon: 'cog', class: 'red_color', title: 'Settings', roles: ['ROLE_ADMIN'],
+        // }
       ],
     }),
     computed: {
