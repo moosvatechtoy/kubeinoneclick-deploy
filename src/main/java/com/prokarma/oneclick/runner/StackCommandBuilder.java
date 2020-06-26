@@ -92,7 +92,7 @@ public class StackCommandBuilder {
     }
 
     private String buildCommand(Stack stack, TerraformModule module, String command) {
-        var varFormatString = "-var \"%s=%s\" ";
+        var varFormatString = "-var \'%s=%s\' ";
         var variablesBuilder = new StringBuilder();
 
         module.getVariables().forEach(terraformVariable -> {
