@@ -23,6 +23,11 @@ public enum StackState {
     /**
      * When the stack has been stopped
      */
-    STOPPED
+    STOPPED,
+
+    /**
+     * When any of job failed
+     */
+    FAILED
 
 }

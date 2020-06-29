@@ -88,6 +88,8 @@ public class StackRunner {
             jobWorkflow.end();
         } else {
             // error
+            stack.setState(StackState.FAILED);
+            stackRepository.save(stack);
             jobWorkflow.fail();
         }
     }
@@ -107,6 +109,8 @@ public class StackRunner {
             stack.setState(jobWorkflow.getJob().getType() == JobType.RUN ? StackState.RUNNING : StackState.STOPPED);
             stackRepository.save(stack);
         } else {
+            stack.setState(StackState.FAILED);
+            stackRepository.save(stack);
             jobWorkflow.fail();
         }
     }

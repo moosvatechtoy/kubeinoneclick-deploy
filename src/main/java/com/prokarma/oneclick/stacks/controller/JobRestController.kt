@@ -9,6 +9,7 @@ import com.prokarma.oneclick.stacks.repository.StepRepository
 import com.prokarma.oneclick.stacks.workflow.JobWorkflow
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.*
+import java.time.LocalDateTime
 
 @RestController
 @RequestMapping("/api/jobs")
@@ -26,9 +27,17 @@ class JobRestController(
     fun job(@PathVariable id: String): com.prokarma.oneclick.stacks.bo.Job {
         val runningJob = stackRunner.getJob(id);
         if (runningJob.isPresent) {
+            var job = runningJob.get();
+            if (null == job.endDateTime) {
+                job.endDateTime = LocalDateTime.now();
+            }
             return runningJob.get();
         }
-        return jobRepository.findById(id).orElseThrow { JobNotFoundException() }
+        var job = jobRepository.findById(id).orElseThrow { JobNotFoundException() };
+        if (null == job.endDateTime) {
+            job.endDateTime = LocalDateTime.now();
+        }
+        return job
     }
 
     @PostMapping("/{id}/plan")
