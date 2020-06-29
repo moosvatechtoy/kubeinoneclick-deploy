@@ -3,7 +3,7 @@ import Vue from 'vue';
 function formatDate(value, options) {
   if (!value) return '';
   let utcSplitTime = value.split('T');
-  let date = utcSplitTime[0] + ' ' + utcSplitTime[1].substring(0, 5) + ' UTC';
+  let date = utcSplitTime[0] + ' ' + utcSplitTime[1].substring(0, 8) + ' UTC';
   return new Intl.DateTimeFormat(undefined, options).format(new Date(date));
 }
 

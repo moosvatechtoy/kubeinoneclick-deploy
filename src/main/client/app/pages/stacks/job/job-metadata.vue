@@ -56,8 +56,8 @@
         />&nbsp;Duration
         <strong>
           <app-job-timer
-            :start-time="job.startDateTime"
-            :end-time="job.endDateTime"
+            :start-time="job.startDateTime | dateTimeLong"
+            :end-time="job.endDateTime | dateTimeLong"
           />
         </strong>
       </p>
