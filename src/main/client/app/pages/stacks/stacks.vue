@@ -31,7 +31,7 @@
           searchable
           placeholder="Select Status"
           :show-labels="false"
-          :options="['', 'NEW', 'RUNNING', 'STOPPED']"
+          :options="['', 'NEW', 'RUNNING', 'STOPPED', 'FAILED']"
           @select="onStatusSelect"
         />
       </b-col>
@@ -150,10 +150,16 @@ export default {
         text: "to update"
       },
       STOPPED: {
-        variant: "danger",
+        variant: "warning",
         tooltip: "Your Cluster has been stopped.",
         icon: "stop-circle",
         text: "stopped"
+      },
+      FAILED: {
+        variant: "danger",
+        tooltip: "Your Cluster has been Failed.",
+        icon: "stop-circle",
+        text: "failed"
       }
     }
   }),

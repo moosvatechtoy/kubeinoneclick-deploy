@@ -95,6 +95,15 @@
               >
                 <i class="fas fa-stop-circle" /> stopped
               </b-badge>
+              <b-badge
+                v-if="stack.state === 'FAILED'"
+                variant="danger"
+                pill
+                data-toggle="tooltip"
+                title="Your Cluster has been failed."
+              >
+                <i class="fas fa-stop-circle" /> failed
+              </b-badge>
             </h2>
           </div>
           <div class="block_content">

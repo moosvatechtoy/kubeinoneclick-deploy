@@ -124,7 +124,7 @@ export default {
     this.stackbyStatusAndProviderOptions = {
       chart: {
         type: "column",
-        marginBottom: 70
+        marginBottom: 90
       },
       title: {
         text: "Clusters By Status & Template"
@@ -183,7 +183,7 @@ export default {
           "#FFFFFF",
         shadow: true
       },
-      colors: ["#2f7ed8", "#8bbc21", "#C70000"],
+      colors: ["#2f7ed8", "#8bbc21", '#eb720c', "#C70000"],
       credits: {
         enabled: false
       },
@@ -276,6 +276,10 @@ export default {
         {
           name: "Stopped",
           data: zeroFilled
+        },
+        {
+          name: "Failed",
+          data: zeroFilled
         }
       ];
       if (summary.stacks.length > 0) {
@@ -290,12 +294,17 @@ export default {
           let stoppedStacks = summary.stacks.filter(
             item => item.moduleId === module.id && item.state === "STOPPED"
           );
+          let failedStacks = summary.stacks.filter(
+            item => item.moduleId === module.id && item.state === "FAILED"
+          );
           let newStacksData = Object.assign([], counts[0].data);
           newStacksData[providerIndex] = newStacks.length;
           let runningStacksData = Object.assign([], counts[1].data);
           runningStacksData[providerIndex] = runnnigStacks.length;
           let stoppedStacksData = Object.assign([], counts[2].data);
           stoppedStacksData[providerIndex] = stoppedStacks.length;
+          let failedStacksData = Object.assign([], counts[3].data);
+          failedStacksData[providerIndex] = failedStacks.length;
           counts = [
             {
               name: "New",
@@ -308,6 +317,10 @@ export default {
             {
               name: "Stopped",
               data: stoppedStacksData
+            },
+            {
+              name: "Failed",
+              data: failedStacksData
             }
           ];
         }
