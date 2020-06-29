@@ -31,7 +31,7 @@ class JobRestController(
             if (null == job.endDateTime) {
                 job.endDateTime = LocalDateTime.now();
             }
-            return runningJob.get();
+            return job;
         }
         var job = jobRepository.findById(id).orElseThrow { JobNotFoundException() };
         if (null == job.endDateTime) {
