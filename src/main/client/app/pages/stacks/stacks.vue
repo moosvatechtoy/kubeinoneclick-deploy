@@ -3,12 +3,12 @@
     <b-form-row>
       <b-col cols="7">
         <b-button
-          title="Add Provisioner"
+          title="Add Cluster"
           variant="success"
           class="mb-4"
           v-b-modal.modal-prevent-closing
         >
-          <font-awesome-icon icon="plus" />Add Provisioner
+          <font-awesome-icon icon="plus" />Add Cluster
         </b-button>
       </b-col>
       <b-col cols="3">
@@ -18,7 +18,7 @@
           label="name"
           track-by="id"
           searchable
-          placeholder="Select Provider"
+          placeholder="Select Template"
           :options="modules"
           :show-labels="false"
           @select="onProviderSelect"
@@ -31,7 +31,7 @@
           searchable
           placeholder="Select Status"
           :show-labels="false"
-          :options="['NEW', 'RUNNING']"
+          :options="['', 'NEW', 'RUNNING', 'STOPPED', 'FAILED']"
           @select="onStatusSelect"
         />
       </b-col>
@@ -54,14 +54,14 @@
 
         <b-button
           :to="{ name: 'stack_edition', params: { stackId: stack.id }}"
-          title="Edit this Provisioner"
+          title="Edit this Cluster"
           variant="primary"
           class="mr-1"
         >
           <font-awesome-icon icon="edit" />
         </b-button>
         <b-button
-          title="Delete this Provisioner"
+          title="Delete this Cluster"
           variant="danger"
           class="mr-1"
           @click="deleteStack(stack.id)"
@@ -74,7 +74,7 @@
     <b-modal
       id="modal-prevent-closing"
       ref="modal"
-      title="Select Provider"
+      title="Select Template"
       okVariant="success"
       @show="resetModal"
       @hidden="resetModal"
@@ -83,9 +83,9 @@
       <form ref="form" @submit.stop.prevent="handleSubmit">
         <b-form-group
           :state="templateState"
-          description="The Provider to create Provisioner"
+          description="The Template to create Cluster"
           label-for="template-input"
-          invalid-feedback="Provider is required to create Provisioner"
+          invalid-feedback="Template is required to create Cluster"
         >
         <vue-multiselect
           v-model="moduleId"
@@ -93,7 +93,7 @@
           label="name"
           track-by="id"
           searchable
-          placeholder="Select Provider"
+          placeholder="Select Template"
           :options="modules"
           :show-labels="false"
           :state="templateState"
@@ -117,6 +117,10 @@ export default {
         type: String,
         required: false
       },
+      clusterStatus: {
+        type: String,
+        required: false
+      }
     },
   data: () => ({
     templateState: null,
@@ -129,27 +133,33 @@ export default {
     states: {
       NEW: {
         variant: "success",
-        tooltip: "Your provisioner is new and has not been started yet.",
+        tooltip: "Your Cluster is new and has not been started yet.",
         icon: "star-of-life",
         text: "new"
       },
       RUNNING: {
         variant: "primary",
-        tooltip: "Your provisioner is up and running !",
+        tooltip: "Your Cluster is up and running !",
         icon: ["far", "check-square"],
         text: "running"
       },
       TO_UPDATE: {
         variant: "warning",
-        tooltip: "Your Provisioner needs an update !",
+        tooltip: "Your Cluster needs an update !",
         icon: "upload",
         text: "to update"
       },
       STOPPED: {
-        variant: "danger",
-        tooltip: "Your Provisioner has been stopped.",
+        variant: "warning",
+        tooltip: "Your Cluster has been stopped.",
         icon: "stop-circle",
         text: "stopped"
+      },
+      FAILED: {
+        variant: "danger",
+        tooltip: "Your Cluster has been Failed.",
+        icon: "stop-circle",
+        text: "failed"
       }
     }
   }),
@@ -161,6 +171,9 @@ export default {
       if (moduleFiltered && moduleFiltered.length > 0) {
         this.provider = moduleFiltered[0];
       }
+    }
+    if (this.clusterStatus) {
+      this.status = this.clusterStatus;
     }
     this.onProviderSelect(this.provider);
   },

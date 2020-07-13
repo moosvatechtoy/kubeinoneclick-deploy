@@ -52,14 +52,14 @@
             icon="play"
             class="icon"
           />
-          Started&nbsp;<strong>{{ step.startDateTime | dateTimeLong }}</strong>
+          Started&nbsp;<strong>{{ step.startDateTime }}</strong>
         </p>
         <p v-if="step.endDateTime">
           <font-awesome-icon
             icon="stop"
             class="icon"
           />
-          Ended&nbsp;<strong>{{ step.endDateTime | dateTimeLong }}</strong>
+          Ended&nbsp;<strong>{{ step.endDateTime }}</strong>
         </p>
         <p>
           <font-awesome-icon
@@ -69,8 +69,8 @@
           Duration&nbsp;
           <strong>
             <app-job-timer
-              :start-time="step.startDateTime"
-              :end-time="step.endDateTime"
+              :start-time="step.startDateTime | dateTimeLong"
+              :end-time="step.endDateTime | dateTimeLong"
             />
           </strong>
         </p>

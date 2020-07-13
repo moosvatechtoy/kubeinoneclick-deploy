@@ -23,6 +23,10 @@ public class TerraformModule {
 
     private String directory;
 
+    private String gitUsername;
+
+    private String gitPassword;
+
     @Valid
     private List<Variable> variables = new ArrayList<>();
 
@@ -87,6 +91,22 @@ public class TerraformModule {
 
     public void setDirectory(String directory) {
         this.directory = directory;
+    }
+
+    public String getGitUsername() {
+        return gitUsername;
+    }
+
+    public void setGitUsername(String gitUsername) {
+        this.gitUsername = gitUsername;
+    }
+
+    public String getGitPassword() {
+        return gitPassword;
+    }
+
+    public void setGitPassword(String gitPassword) {
+        this.gitPassword = gitPassword;
     }
 
     public void setName(String name) {

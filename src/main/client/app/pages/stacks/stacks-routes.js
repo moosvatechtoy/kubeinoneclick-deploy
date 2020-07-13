@@ -1,28 +1,28 @@
 const stacksRoutes = [
   {
-    path: '/stacks',
+    path: '/clusters',
     name: 'stacks',
     props: true,
     component: () => import(/* webpackChunkName: "chunk-stacks" */ '@/pages/stacks/stacks.vue'),
     meta: {
       authorities: ['ROLE_USER'],
-      breadcrumb: [{ text: 'Provisioners' }],
-      title: 'OneClick - Provisioners',
+      breadcrumb: [{ text: 'Clusters' }],
+      title: 'OneClick - Clusters',
     },
   },
   {
-    path: '/stacks/new',
+    path: '/clusters/new',
     name: 'stack_creation',
     component: () => import(/* webpackChunkName: "chunk-stacks" */ '@/pages/stacks/stack-creation.vue'),
     props: true,
     meta: {
       authorities: ['ROLE_USER'],
-      breadcrumb: [{ text: 'Provisioners', to: { name: 'stacks' } }, { text: 'Provisioner creation' }],
-      title: 'OneClick - Provisioner creation',
+      breadcrumb: [{ text: 'Clusters', to: { name: 'stacks' } }, { text: 'Cluster creation' }],
+      title: 'OneClick - Cluster creation',
     },
   },
   {
-    path: '/stacks/:stackId',
+    path: '/clusters/:stackId',
     component: () => import(/* webpackChunkName: "chunk-stacks" */ '@/pages/stacks/stack.vue'),
     meta: {
       authorities: ['ROLE_USER'],
@@ -35,8 +35,8 @@ const stacksRoutes = [
         component: () => import(/* webpackChunkName: "chunk-stacks" */ '@/pages/stacks/stack-edition.vue'),
         meta: {
           authorities: ['ROLE_USER'],
-          breadcrumb: [{ text: 'Provisioners', to: { name: 'stacks' } }, { text: 'Provisioner edition' }],
-          title: 'OneClick - Provisioner edition',
+          breadcrumb: [{ text: 'Clusters', to: { name: 'stacks' } }, { text: 'Cluster edition' }],
+          title: 'OneClick - Cluster edition',
         },
       },
       {
@@ -47,11 +47,11 @@ const stacksRoutes = [
         meta: {
           authorities: ['ROLE_USER'],
           breadcrumb: [
-            { text: 'Provisioners', to: { name: 'stacks' } },
-            { text: 'Provisioner', to: { name: 'stack_edition' } },
+            { text: 'Clusters', to: { name: 'stacks' } },
+            { text: 'Cluster', to: { name: 'stack_edition' } },
             { text: 'Job' },
           ],
-          title: 'OneClick - Provisioner job',
+          title: 'OneClick - Cluster job',
         },
       },
     ],

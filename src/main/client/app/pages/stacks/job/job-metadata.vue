@@ -10,7 +10,7 @@
           icon="folder"
           class="icon"
         />&nbsp;
-        Provider
+        Template
         <router-link :to="{ name: 'module_description', params: { moduleId: stack.moduleId }}">
           {{ stack.moduleId }}
         </router-link>
@@ -20,7 +20,7 @@
           icon="file"
           class="icon"
         />&nbsp;
-        Provisioner
+        Cluster
         <router-link :to="{ name: 'stack_edition', params: { stackId: stack.id }}">
           {{ stack.id }}
         </router-link>
@@ -56,8 +56,8 @@
         />&nbsp;Duration
         <strong>
           <app-job-timer
-            :start-time="job.startDateTime"
-            :end-time="job.endDateTime"
+            :start-time="job.startDateTime | dateTimeLong"
+            :end-time="job.endDateTime | dateTimeLong"
           />
         </strong>
       </p>

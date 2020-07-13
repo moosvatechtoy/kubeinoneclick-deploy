@@ -4,11 +4,11 @@
       <b-col cols="10">
         <b-button
           :to="{ name: 'module', params: { moduleId: 'ADD' }}"
-          title="Add Configuration"
+          title="Add Template"
           variant="success"
           class="mb-4"
         >
-          <font-awesome-icon icon="plus" />Add Configuration
+          <font-awesome-icon icon="plus" />Add Template
         </b-button>
       </b-col>
     </b-form-row>
@@ -31,7 +31,7 @@
 
         <b-button
           :to="{ name: 'module', params: { moduleId: module.id }}"
-          title="Edit this Configuration"
+          title="Edit this Template"
           variant="primary"
           class="mr-1"
         >
@@ -40,7 +40,7 @@
 
         <b-button
           :to="{ name: 'module_description', params: { moduleId: module.id }}"
-          title="Detail of this Configuration"
+          title="Detail of this Template"
           variant="primary"
           class="mr-1"
         >
@@ -48,7 +48,7 @@
         </b-button>
 
         <b-button
-          title="Run this Configuration"
+          title="Run this Template"
           variant="primary"
           class="mr-1"
           @click="createStack(module.id)"
@@ -57,7 +57,7 @@
         </b-button>
 
         <b-button
-          title="Delete this Configuration"
+          title="Delete this Template"
           variant="danger"
           class="mr-1"
           @click="deleteModule(module.id)"

@@ -33,6 +33,7 @@ public class StackCommandBuilder {
     private StateApiSecurityConfig.StateApiSecurityProperties stateApiSecurityProperties;
     private Mustache terraformMustache;
     private List<RegistryOAuth2Provider> registryOAuth2Providers;
+    private static  final String GIT_WITH_CREDENTIALS = "%s://%s:%s@%s";
 
     @Autowired
     StackCommandBuilder(Settings settings, Mustache terraformMustache, List<RegistryOAuth2Provider> registryOAuth2Providers, StateApiSecurityConfig.StateApiSecurityProperties stateApiSecurityProperties) {
@@ -49,7 +50,10 @@ public class StackCommandBuilder {
         var url = module.getGitRepositoryUrl();
         var data = module.getModuleMetadata().getCreatedBy().getOAuth2User();
         if (data == null) {
-            return url;
+            String[] gitURLSplit = url.split("://");
+            return StringUtils.isNotBlank(module.getGitUsername()) ?
+                    String.format(GIT_WITH_CREDENTIALS, gitURLSplit[0], module.getGitUsername(), module.getGitPassword(), gitURLSplit[1])
+                    : url;
         }
         return registryOAuth2Providers.stream()
                 .filter(p -> p.isAssignableFor(data.getProvider()))
@@ -75,6 +79,7 @@ public class StackCommandBuilder {
 
         if (module.isRemoteCode()) {
             script.setGitRepositoryUrl(evalGitRepositoryUrl(module));
+            script.setGitBranch(module.getGitBranch());
         } else {
             script.setLocalDirectory(module.getLocalCodeLocation());
         }
@@ -92,7 +97,7 @@ public class StackCommandBuilder {
     }
 
     private String buildCommand(Stack stack, TerraformModule module, String command) {
-        var varFormatString = "-var \"%s=%s\" ";
+        var varFormatString = "-var \'%s=%s\' ";
         var variablesBuilder = new StringBuilder();
 
         module.getVariables().forEach(terraformVariable -> {

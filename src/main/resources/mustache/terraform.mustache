@@ -8,7 +8,7 @@ rm -rf module || true
 
 {{#gitRepositoryUrl}}
 echo 'cloning {{gitRepositoryUrl}}' | awk '{ sub(/oauth2:(.*)@/, "oauth2:[MASKED]@");}1'
-git clone {{gitRepositoryUrl}} module
+git clone -b {{gitBranch}} {{gitRepositoryUrl}} module
 cd module
 {{/gitRepositoryUrl}}
 

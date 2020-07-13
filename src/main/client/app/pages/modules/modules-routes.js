@@ -1,44 +1,44 @@
 const modulesRoutes = [
   {
-    path: '/modules',
+    path: '/templates',
     name: 'modules',
     component: () => import(/* webpackChunkName: "chunk-modules" */ '@/pages/modules/modules.vue'),
     meta: {
       authorities: ['ROLE_USER'],
-      breadcrumb: [{ text: 'Configurations' }],
-      title: 'OneClick - Configurations',
+      breadcrumb: [{ text: 'Templates' }],
+      title: 'OneClick - Templates',
     },
   },
   {
-    path: '/modules/import',
+    path: '/templates/import',
     name: 'module_import',
     component: () => import(/* webpackChunkName: "chunk-modules" */ '@/pages/modules/module-import.vue'),
     meta: {
       authorities: ['ROLE_USER'],
-      breadcrumb: [{ text: 'Configurations', to: { name: 'modules' } }, { text: 'Configuration import' }],
-      title: 'OneClick - Configurations import',
+      breadcrumb: [{ text: 'Templates', to: { name: 'modules' } }, { text: 'Template import' }],
+      title: 'OneClick - Templates import',
     },
   },
   {
-    path: '/modules/:moduleId',
+    path: '/templates/:moduleId',
     name: 'module',
     component: () => import(/* webpackChunkName: "chunk-modules" */ '@/pages/modules/module.vue'),
     props: true,
     meta: {
       authorities: ['ROLE_USER'],
-      breadcrumb: [{ text: 'Configurations', to: { name: 'modules' } }, { text: 'Configuration edition' }],
-      title: 'OneClick - Configuration edition',
+      breadcrumb: [{ text: 'Templates', to: { name: 'modules' } }, { text: 'Template edition' }],
+      title: 'OneClick - Template edition',
     },
   },
   {
-    path: '/modules/:moduleId/description',
+    path: '/templates/:moduleId/description',
     name: 'module_description',
     component: () => import(/* webpackChunkName: "chunk-modules" */ '@/pages/modules/module-description.vue'),
     props: true,
     meta: {
       authorities: ['ROLE_USER'],
-      breadcrumb: [{ text: 'Configurations', to: { name: 'modules' } }, { text: 'Configuration details' }],
-      title: 'OneClick - Configuration description',
+      breadcrumb: [{ text: 'Templates', to: { name: 'modules' } }, { text: 'Template details' }],
+      title: 'OneClick - Template description',
     },
   },
 ];

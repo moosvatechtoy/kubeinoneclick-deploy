@@ -8,6 +8,7 @@ public class TerraformScript {
     private String terraformImage;
     private String gitRepositoryUrl;
     private String gitDirectory;
+    private String gitBranch;
     private String localDirectory;
     private String externalUrl;
     private String stackId;
@@ -49,6 +50,14 @@ public class TerraformScript {
     public TerraformScript setLocalDirectory(String localDirectory) {
         this.localDirectory = localDirectory;
         return this;
+    }
+
+    public String getGitBranch() {
+        return gitBranch;
+    }
+
+    public void setGitBranch(String gitBranch) {
+        this.gitBranch = gitBranch;
     }
 
     public String getExternalUrl() {
