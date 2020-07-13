@@ -110,7 +110,6 @@
             >
               <b-input
                 v-model="module.gitUsername"
-                :state="notEmpty(module.gitUsername)"
               />
               <b-form-invalid-feedback>This field is mandatory</b-form-invalid-feedback>
             </b-form-group>
@@ -123,7 +122,6 @@
               <b-input
                 type="password"
                 v-model="module.gitPassword"
-                :state="notEmpty(module.gitPassword)"
               />
               <b-form-invalid-feedback>This field is mandatory</b-form-invalid-feedback>
             </b-form-group>

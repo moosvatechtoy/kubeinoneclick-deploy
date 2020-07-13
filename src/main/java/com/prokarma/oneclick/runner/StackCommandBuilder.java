@@ -51,7 +51,9 @@ public class StackCommandBuilder {
         var data = module.getModuleMetadata().getCreatedBy().getOAuth2User();
         if (data == null) {
             String[] gitURLSplit = url.split("://");
-            return String.format(GIT_WITH_CREDENTIALS, gitURLSplit[0], module.getGitUsername(), module.getGitPassword(), gitURLSplit[1]);
+            return StringUtils.isNotBlank(module.getGitUsername()) ?
+                    String.format(GIT_WITH_CREDENTIALS, gitURLSplit[0], module.getGitUsername(), module.getGitPassword(), gitURLSplit[1])
+                    : url;
         }
         return registryOAuth2Providers.stream()
                 .filter(p -> p.isAssignableFor(data.getProvider()))

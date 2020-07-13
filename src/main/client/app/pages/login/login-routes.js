@@ -7,7 +7,7 @@ const loginRoutes = [
     component: AppLoginForm,
     meta: {
       layout: 'none',
-      title: 'OneClick - THE UI - Login',
+      title: 'OneClick - Login',
     },
   },
 ];

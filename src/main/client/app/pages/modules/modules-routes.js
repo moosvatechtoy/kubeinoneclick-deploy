@@ -1,6 +1,6 @@
 const modulesRoutes = [
   {
-    path: '/modules',
+    path: '/templates',
     name: 'modules',
     component: () => import(/* webpackChunkName: "chunk-modules" */ '@/pages/modules/modules.vue'),
     meta: {
@@ -10,7 +10,7 @@ const modulesRoutes = [
     },
   },
   {
-    path: '/modules/import',
+    path: '/templates/import',
     name: 'module_import',
     component: () => import(/* webpackChunkName: "chunk-modules" */ '@/pages/modules/module-import.vue'),
     meta: {
@@ -20,7 +20,7 @@ const modulesRoutes = [
     },
   },
   {
-    path: '/modules/:moduleId',
+    path: '/templates/:moduleId',
     name: 'module',
     component: () => import(/* webpackChunkName: "chunk-modules" */ '@/pages/modules/module.vue'),
     props: true,
@@ -31,7 +31,7 @@ const modulesRoutes = [
     },
   },
   {
-    path: '/modules/:moduleId/description',
+    path: '/templates/:moduleId/description',
     name: 'module_description',
     component: () => import(/* webpackChunkName: "chunk-modules" */ '@/pages/modules/module-description.vue'),
     props: true,

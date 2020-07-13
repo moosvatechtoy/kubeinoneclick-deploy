@@ -1,6 +1,6 @@
 const stacksRoutes = [
   {
-    path: '/stacks',
+    path: '/clusters',
     name: 'stacks',
     props: true,
     component: () => import(/* webpackChunkName: "chunk-stacks" */ '@/pages/stacks/stacks.vue'),
@@ -11,7 +11,7 @@ const stacksRoutes = [
     },
   },
   {
-    path: '/stacks/new',
+    path: '/clusters/new',
     name: 'stack_creation',
     component: () => import(/* webpackChunkName: "chunk-stacks" */ '@/pages/stacks/stack-creation.vue'),
     props: true,
@@ -22,7 +22,7 @@ const stacksRoutes = [
     },
   },
   {
-    path: '/stacks/:stackId',
+    path: '/clusters/:stackId',
     component: () => import(/* webpackChunkName: "chunk-stacks" */ '@/pages/stacks/stack.vue'),
     meta: {
       authorities: ['ROLE_USER'],
