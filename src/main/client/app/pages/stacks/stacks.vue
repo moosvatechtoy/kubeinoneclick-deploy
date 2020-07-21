@@ -79,6 +79,7 @@
       @show="resetModal"
       @hidden="resetModal"
       @ok="handleOk"
+      button-size="sm"
     >
       <form ref="form" @submit.stop.prevent="handleSubmit">
         <b-form-group

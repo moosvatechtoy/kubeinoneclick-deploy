@@ -50,6 +50,21 @@
                 >{{ module.name }}</router-link>
               </p>
             </div>
+            <b-form-row class="metadata">
+              <b-col cols="3">
+                <p>
+                  Time Left :
+                  <font-awesome-icon
+                    :icon="['fa', 'edit']"
+                    class="icon edit"
+                    @click="$bvModal.show('update-destroy-time-modal')"
+                  />
+                </p>
+              </b-col>
+              <b-col cols="6">
+                <span class="time-left">05:01:07</span>
+              </b-col>
+            </b-form-row>
             <div class="metadata">
               <p>
                 Published
@@ -145,19 +160,74 @@
 
     <div class="row margin_bottom_30">
       <div class="col-md-6">
-        <div class="block">
-          <div class="block_head">
-            <h2>Variable values</h2>
-            <small>This is the configuration of your profile's variables !</small>
+        <div class="column">
+          <div class="block margin_bottom_30">
+            <div class="block_head">
+              <h2>Variable values</h2>
+              <small>This is the configuration of your profile's variables !</small>
+            </div>
+            <div v-if="stack.variables" class="block_content">
+              <app-stack-variable
+                v-for="variable in editableVars"
+                :key="variable.name"
+                v-model="variable.value"
+                v-bind="moduleVar(variable.name)"
+                @valid="(isValid) => variable.isValid = isValid"
+              />
+            </div>
           </div>
-          <div v-if="stack.variables" class="block_content">
-            <app-stack-variable
-              v-for="variable in editableVars"
-              :key="variable.name"
-              v-model="variable.value"
-              v-bind="moduleVar(variable.name)"
-              @valid="(isValid) => variable.isValid = isValid"
-            />
+          <div class="block">
+            <div class="block_head">
+              <h2>Scheduling</h2>
+              <small>Scheduling allows you to deploy and destroy your cluster on a scheduled basis.</small>
+            </div>
+            <div class="block_content">
+              <div class="small">Specify cron expressions below (in UTC timezone):</div>
+              <b-form-row class="align-items-center margin_top_10 margin_bottom_10">
+                <b-col cols="4">
+                  <b-form-checkbox
+                    id="deploySchedule"
+                    v-model="stack.deploySchedule"
+                    name="deploySchedule"
+                  >Deploy Schedule</b-form-checkbox>
+                </b-col>
+                <b-col cols="6">
+                  <b-form-group>
+                    <b-input
+                      id="deployScheduleExpression"
+                      v-model="stack.deployScheduleExpression"
+                      type="text"
+                      class="form-control"
+                      :state="validateRegex(stack.deploySchedule, stack.deployScheduleExpression)"
+                      :disabled="!stack.deploySchedule"
+                    />
+                    <!-- <b-form-invalid-feedback>Invalid cron expression syntax</b-form-invalid-feedback> -->
+                  </b-form-group>
+                </b-col>
+              </b-form-row>
+              <b-form-row class="align-items-center">
+                <b-col cols="4">
+                  <b-form-checkbox
+                    id="destroySchedule"
+                    v-model="stack.destroySchedule"
+                    name="destroySchedule"
+                  >Destroy Schedule</b-form-checkbox>
+                </b-col>
+                <b-col cols="6">
+                  <b-form-group>
+                    <b-input
+                      id="destroyScheduleExpression"
+                      v-model="stack.destroyScheduleExpression"
+                      type="text"
+                      class="form-control"
+                      :state="validateRegex(stack.destroySchedule, stack.destroyScheduleExpression)"
+                      :disabled="!stack.destroySchedule"
+                    />
+                    <!-- <b-form-invalid-feedback>Invalid cron expression syntax</b-form-invalid-feedback> -->
+                  </b-form-group>
+                </b-col>
+              </b-form-row>
+            </div>
           </div>
         </div>
       </div>
@@ -165,6 +235,81 @@
         <app-job-history :jobs="jobs" @job-deleted="refreshJobs" />
       </div>
     </div>
+
+    <b-modal
+      id="update-destroy-time-modal"
+      ref="modal"
+      title="Update Destroy Time"
+      okVariant="success"
+      button-size="sm"
+      @ok="handleTimeLeftOk"
+    >
+      <form ref="form" @submit.stop.prevent="handleTimeLeftSubmit">
+        <b-form-group label="Cluster will be destroyed in">
+          <b-form-row>
+            <b-col cols="4">
+              <b-form-radio-group
+                id="radio-group-1"
+                v-model="stack.destroyType"
+                name="destroy-options"
+              >
+                <b-form-radio class="destroy-after-option" value="T">Destroy after</b-form-radio>
+                <b-form-radio value="D">Specific time limit</b-form-radio>
+              </b-form-radio-group>
+            </b-col>
+            <b-col cols="4" v-if="stack.destroyType == 'T'">
+              <b-form-select v-model="stack.destroyAfterHours" :options="destroyAfterTimeOption"></b-form-select>
+            </b-col>
+            <b-col cols="5" class="specific-time-limit" v-if="stack.destroyType == 'D'">
+              <b-form-datepicker
+                id="destroyAfterTime-datepicker"
+                placeholder="Date"
+                v-model="stack.destroyAfterDate"
+              ></b-form-datepicker>
+            </b-col>
+            <b-col cols="3" class="specific-time-limit" v-if="stack.destroyType == 'D'">
+              <b-form-timepicker v-model="stack.destroyAfterTime" placeholder="Time" locale="en"></b-form-timepicker>
+            </b-col>
+          </b-form-row>
+        </b-form-group>
+      </form>
+    </b-modal>
+
+    <b-modal
+      id="update-credential-modal"
+      ref="modal"
+      title="Credentials"
+      okVariant="success"
+      button-size="sm"
+      :ok-disabled="Boolean(!credentialsFormValid)"
+      @ok="handleCredentialsOk"
+    >
+      <form ref="form" @submit.stop.prevent="handleCredentialsSubmit">
+        <div
+          v-if="module.mainProvider != 'GOOGLE' && credentialVariables"
+          class="block-content-modal"
+        >
+          <app-stack-variable
+            v-for="variable in credentialVariables"
+            :key="variable.name"
+            :name="variable.name"
+            :description="variable.description"
+            :value="variable.value"
+            :validationRegex="variable.validationRegex"
+            :mandatory="variable.mandatory"
+            v-model="variable.value"
+            @valid="(isValid) => variable.isValid = isValid"
+          />
+        </div>
+        <b-form-file
+          v-model="googleCredentials"
+          :state="Boolean(googleCredentials)"
+          placeholder="Google Service Credentials"
+          v-if="module.mainProvider == 'GOOGLE'"
+          accept=".json"
+        ></b-form-file>
+      </form>
+    </b-modal>
   </div>
 </template>
 
@@ -188,6 +333,7 @@ import {
   displayNotification
 } from "@/shared/services/modal-service";
 import { getJobs } from "@/shared/api/jobs-api";
+import { CREDENTIAL_VARIABLES } from "@/shared/constants/credentials";
 
 export default {
   name: "AppStackEdition",
@@ -210,8 +356,32 @@ export default {
     stack: null,
     module: null,
     state: { outputs: {} },
-    jobs: []
+    jobs: [],
+    credentialVariables: [],
+    destroyAfterTimeOption: [
+      { text: "8 Hours", value: "8" },
+      { text: "12 Hours", value: "12" },
+      { text: "24 Hours", value: "24" },
+      { text: "Never", value: "-1" }
+    ],
+    googleCredentials: null,
+    googleCredentialValue: null,
+    credentialsFormValid: false
   }),
+
+  watch: {
+    googleCredentials(val) {
+      if (!val) return;
+      const fileReader = new FileReader();
+      fileReader.onload = e => {
+        console.log(e.target.result);
+        this.googleCredentialValue = e.target.result.substr(29);
+        console.log(this.googleCredentialValue && this.googleCredentialValue.length > 0);
+        this.credentialsFormValid = this.googleCredentialValue && this.googleCredentialValue.length > 0;
+      };
+      fileReader.readAsDataURL(val);
+    }
+  },
 
   computed: {
     formValid() {
@@ -273,6 +443,11 @@ export default {
       this.stack.variables.forEach(variable => {
         this.stack.variableValues[variable.name] = variable.value;
       });
+      if (this.credentialVariables && this.credentialVariables.length > 0) {
+        this.credentialVariables.forEach(variable => {
+          this.stack.variableValues[variable.name] = variable.value;
+        });
+      }
       saveStack(this.stack)
         .then(() =>
           displayNotification(this, {
@@ -288,12 +463,31 @@ export default {
         });
     },
     async runStack() {
-      // ask for confirmation
-      const message = "Modifications must be saved before. Continue?";
-      if (await displayConfirmDialog(this, { title: "Run request", message })) {
-        await this.saveStack();
-        const { jobId } = await runStack(this.stack.id);
-        this.$router.push({ name: "job", params: { jobId } });
+      if (this.module.mainProvider == "ONPREM") {
+        // ask for confirmation
+        const message = "Modifications must be saved before. Continue?";
+        if (
+          await displayConfirmDialog(this, { title: "Run request", message })
+        ) {
+          await this.saveStack();
+          const { jobId } = await runStack(this.stack.id);
+          this.$router.push({ name: "job", params: { jobId } });
+        }
+      } else {
+        if (this.module.mainProvider == "AWS") {
+          this.credentialVariables = Object.assign(
+            [],
+            CREDENTIAL_VARIABLES.AWS
+          );
+          this.credentialsFormValid = true;
+        } else if (this.module.mainProvider == "AZURE") {
+          this.credentialVariables = Object.assign(
+            [],
+            CREDENTIAL_VARIABLES.AZURE
+          );
+          this.credentialsFormValid = true;
+        }
+        this.$bvModal.show("update-credential-modal");
       }
     },
     async stopStack() {
@@ -309,10 +503,74 @@ export default {
     },
     async refreshJobs() {
       this.jobs = await getJobs(this.stackId);
+    },
+    validateRegex(isEnabled, value) {
+      if (!isEnabled) {
+        return true;
+      } else {
+        return /((((\d+,)+\d+|(\d+(\/|-)\d+)|\d+|\*) ?){5,7})/g.test(value);
+      }
+    },
+    handleTimeLeftOk(bvModalEvt) {
+      bvModalEvt.preventDefault();
+      this.handleTimeLeftSubmit();
+    },
+    handleTimeLeftSubmit() {
+      this.saveStack();
+      this.$nextTick(() => {
+        this.$bvModal.hide("update-destroy-time-modal");
+      });
+    },
+
+    handleCredentialsOk(bvModalEvt) {
+      bvModalEvt.preventDefault();
+      if (this.module.mainProvider == 'GOOGLE') {
+        this.credentialVariables.push({
+            name: 'credentials',
+            value: this.googleCredentialValue,
+            isValid: true
+        });
+      }
+      let invalidItems = this.credentialVariables.filter(item => !item.isValid);
+      if (invalidItems.length == 0) {
+        this.handleCredentialsSubmit();
+      }
+    },
+    async handleCredentialsSubmit() {
+      console.log(this.credentialVariables);
+      this.saveStack();
+      const { jobId } = await runStack(this.stack.id);
+      this.$router.push({ name: "job", params: { jobId } });
+      this.$nextTick(() => {
+        this.$bvModal.hide("update-credential-modal");
+      });
     }
   }
 };
 </script>
 
 <style scoped>
+.align-items-center {
+  align-items: center;
+}
+
+.edit,
+.time-left {
+  color: #3273dc;
+  cursor: pointer;
+}
+
+.specific-time-limit {
+  margin-top: 30px;
+}
+
+.destroy-after-option {
+  margin-top: 8px;
+  margin-bottom: 10px;
+}
+
+.block-content-modal {
+  padding: 18px 25px 15px;
+  width: 100%;
+}
 </style>

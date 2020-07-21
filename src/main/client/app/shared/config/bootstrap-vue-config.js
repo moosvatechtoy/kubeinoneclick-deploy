@@ -21,6 +21,11 @@ import {
   TabsPlugin,
   ToastPlugin,
   TooltipPlugin,
+  FormRadioPlugin,
+  BFormTimepicker,
+  BFormDatepicker,
+  FormSelectPlugin,
+  FormFilePlugin 
 } from 'bootstrap-vue';
 
 export default {
@@ -46,5 +51,10 @@ export default {
     Vue.use(TabsPlugin);
     Vue.use(ToastPlugin);
     Vue.use(TooltipPlugin);
+    Vue.use(FormRadioPlugin);
+    Vue.component('b-form-timepicker', BFormTimepicker);
+    Vue.component('b-form-datepicker', BFormDatepicker);
+    Vue.use(FormSelectPlugin);
+    Vue.use(FormFilePlugin);
   },
 };
