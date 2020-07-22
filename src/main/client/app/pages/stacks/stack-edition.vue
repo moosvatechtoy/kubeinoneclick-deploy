@@ -70,7 +70,7 @@
                 <b-badge variant="info">{{ stack.estimatedRunningCost }} $</b-badge>
               </p>
             </div>
-            <div v-if="stack.enableTTL">
+            <div v-if="stack.enableTTL && stack.state === 'RUNNING'">
               <b-form-row
                 class="metadata"
                 v-if="!stack.destroySchedule && !stack.deploySchedule && stack.destroyType == 'T'"
@@ -101,6 +101,10 @@
                 </b-col>
                 <b-col cols="6">
                   <span class="time-left">{{stack.nextDestroyScheduleTime | dateTime}}</span>
+                  <font-awesome-icon
+                      :icon="['fa', 'rocket']"
+                      class="icon warning"
+                    />
                 </b-col>
               </b-form-row>
               <b-form-row
@@ -114,6 +118,10 @@
                 </b-col>
                 <b-col cols="6">
                   <span class="time-left">{{stack.nextDestroyScheduleTime | dateTime}}</span>
+                  <font-awesome-icon
+                      :icon="['fa', 'rocket']"
+                      class="icon warning"
+                    />
                 </b-col>
               </b-form-row>
               <b-form-row
@@ -126,7 +134,11 @@
                   </p>
                 </b-col>
                 <b-col cols="6">
-                  <span class="time-left">{{stack.nextDestroyScheduleTime | dateTime}}</span>
+                  <span class="time-left">{{stack.nextDeployScheduleTime | dateTime}} </span>
+                  <font-awesome-icon
+                      :icon="['fa', 'rocket']"
+                      class="icon edit"
+                    />
                 </b-col>
               </b-form-row>
             </div>
@@ -667,6 +679,10 @@ export default {
 .time-left {
   color: #3273dc;
   cursor: pointer;
+}
+
+.warning {
+  color: #bd2130;
 }
 
 .specific-time-limit {

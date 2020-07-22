@@ -13,4 +13,5 @@ public interface OneClickConstantsI {
     public static final String CLIENT_SECRET_VAR_KEY = "client_secret";
     public static final String TENANT_ID_VAR_KEY = "tenant_id";
     public static final String ACCESS_KEY_VAR_KEY = "access_key";
+    public static final String DESTROY_NEVER = "-1";
 }

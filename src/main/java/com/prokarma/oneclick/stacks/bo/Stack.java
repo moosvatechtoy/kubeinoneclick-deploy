@@ -86,6 +86,8 @@ public class Stack {
 
     private boolean changeInTTL;
 
+    private boolean isSchedulingTriggered;
+
     public String getId() {
         return id;
     }
@@ -284,5 +286,13 @@ public class Stack {
 
     public void setChangeInTTL(boolean changeInTTL) {
         this.changeInTTL = changeInTTL;
+    }
+
+    public boolean isSchedulingTriggered() {
+        return isSchedulingTriggered;
+    }
+
+    public void setSchedulingTriggered(boolean schedulingTriggered) {
+        isSchedulingTriggered = schedulingTriggered;
     }
 }
