@@ -83,7 +83,7 @@ public class ModuleRestController {
         module.setId(UUID.randomUUID().toString());
         module.getModuleMetadata().setCreatedBy(user);
         if (GOOGLE_PROVIDER.equalsIgnoreCase(module.getMainProvider())) {
-            Variable variable =new Variable(CRED_VAR_KEY, null, null, OneClickConstantsI.GOOGLE_CREDENTIALS_PATH,
+            Variable variable = new Variable(CRED_VAR_KEY, null, null, OneClickConstantsI.GOOGLE_CREDENTIALS_PATH,
                     false, false, null);
             module.getVariables().add(variable);
         }

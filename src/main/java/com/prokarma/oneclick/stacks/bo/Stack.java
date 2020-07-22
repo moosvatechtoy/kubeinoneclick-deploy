@@ -69,7 +69,7 @@ public class Stack {
 
     private LocalDateTime updatedAt;
 
-    private boolean removeCredentials;
+    private boolean enableTTL;
 
     //TTL & Scheduling params
     private boolean deploySchedule;
@@ -185,12 +185,12 @@ public class Stack {
         this.updatedAt = updatedAt;
     }
 
-    public boolean isRemoveCredentials() {
-        return removeCredentials;
+    public boolean isEnableTTL() {
+        return enableTTL;
     }
 
-    public void setRemoveCredentials(boolean removeCredentials) {
-        this.removeCredentials = removeCredentials;
+    public void setEnableTTL(boolean enableTTL) {
+        this.enableTTL = enableTTL;
     }
 
     public boolean isDeploySchedule() {

@@ -1,39 +1,43 @@
 <template>
   <div v-if="stack">
     <div class="page_controls">
-      <b-button :disabled="!formValid" variant="primary" class="mr-1" @click="saveStack">
-        <font-awesome-icon icon="save" />Save
-      </b-button>
-      <b-button v-if="stack.state === 'FAILED'" variant="danger" class="mr-1" @click="retryJob">
-        <font-awesome-icon icon="redo" />Retry
-      </b-button>
-      <b-button
-        v-if="stack.state === 'NEW' || stack.state === 'STOPPED'"
-        :disabled="!formValid"
-        variant="primary"
-        class="mr-1"
-        @click="runStack"
-      >
-        <font-awesome-icon icon="rocket" />Run
-      </b-button>
-      <b-button
-        v-if="stack.state === 'TO_UPDATE'"
-        :disabled="!formValid"
-        variant="warning"
-        class="mr-1"
-        @click="runStack"
-      >
-        <font-awesome-icon icon="upload" />Update
-      </b-button>
-      <b-button
-        v-if="stack.state === 'RUNNING' || stack.state === 'TO_UPDATE'"
-        :disabled="!formValid"
-        variant="danger"
-        class="mr-1"
-        @click="stopStack"
-      >
-        <font-awesome-icon icon="stop-circle" />Destroy
-      </b-button>
+      <div class="row">
+        <div class="col-md-6">
+          <b-button :disabled="!formValid" variant="primary" class="mr-1" @click="saveStack">
+            <font-awesome-icon icon="save" />Save
+          </b-button>
+          <b-button v-if="stack.state === 'FAILED'" variant="danger" class="mr-1" @click="retryJob">
+            <font-awesome-icon icon="redo" />Retry
+          </b-button>
+          <b-button
+            v-if="stack.state === 'NEW' || stack.state === 'STOPPED'"
+            :disabled="!formValid"
+            variant="primary"
+            class="mr-1"
+            @click="runStack"
+          >
+            <font-awesome-icon icon="rocket" />Run
+          </b-button>
+          <b-button
+            v-if="stack.state === 'TO_UPDATE'"
+            :disabled="!formValid"
+            variant="warning"
+            class="mr-1"
+            @click="runStack"
+          >
+            <font-awesome-icon icon="upload" />Update
+          </b-button>
+          <b-button
+            v-if="stack.state === 'RUNNING' || stack.state === 'TO_UPDATE'"
+            :disabled="!formValid"
+            variant="danger"
+            class="mr-1"
+            @click="stopStack"
+          >
+            <font-awesome-icon icon="stop-circle" />Destroy
+          </b-button>
+        </div>
+      </div>
     </div>
 
     <div class="row margin_bottom_30">
@@ -50,21 +54,6 @@
                 >{{ module.name }}</router-link>
               </p>
             </div>
-            <b-form-row class="metadata" v-if="!stack.removeCredentials">
-              <b-col cols="3">
-                <p>
-                  Time Left :
-                  <font-awesome-icon
-                    :icon="['fa', 'edit']"
-                    class="icon edit"
-                    @click="$bvModal.show('update-destroy-time-modal')"
-                  />
-                </p>
-              </b-col>
-              <b-col cols="6">
-                <span class="time-left">05:01:07</span>
-              </b-col>
-            </b-form-row>
             <div class="metadata">
               <p>
                 Published
@@ -81,6 +70,21 @@
                 <b-badge variant="info">{{ stack.estimatedRunningCost }} $</b-badge>
               </p>
             </div>
+            <b-form-row class="metadata" v-if="stack.enableTTL">
+              <b-col cols="3">
+                <p>
+                  Time Left :
+                  <font-awesome-icon
+                    :icon="['fa', 'edit']"
+                    class="icon edit"
+                    @click="$bvModal.show('update-destroy-time-modal')"
+                  />
+                </p>
+              </b-col>
+              <b-col cols="6">
+                <span class="time-left">{{stack.destroyAfterHours == '-1' ? 'Never' : '05:01:07'}}</span>
+              </b-col>
+            </b-form-row>
             <h2>
               <b-badge
                 v-if="stack.state === 'NEW'"
@@ -151,6 +155,20 @@
                 class="form-control"
               />
             </div>
+            <b-form-row class="margin_bottom_10">
+              <b-form-checkbox id="enableTTL" v-model="stack.enableTTL" name="enableTTL">
+                <span id="enableTTLPop">Enable Schedule & TTL</span>
+              </b-form-checkbox>
+              <b-popover
+                target="enableTTLPop"
+                variant="danger"
+                triggers="hover focus"
+                placement="bottomright"
+              >
+                <template v-slot:title>Warning</template>
+                Your credentials will be saved to peform TTL & Scheduling once enabled..!
+              </b-popover>
+            </b-form-row>
           </div>
         </div>
       </div>
@@ -176,9 +194,9 @@
               />
             </div>
           </div>
-          <div class="block">
+          <div class="block" v-if="stack.enableTTL">
             <div class="block_head">
-              <h2>Scheduling</h2>
+              <h2>Scheduling : {{stack.enableTTL ? 'ON' : 'OFF'}}</h2>
               <small>Scheduling allows you to deploy and destroy your cluster on a scheduled basis.</small>
             </div>
             <div class="block_content">
@@ -189,7 +207,7 @@
                     id="deploySchedule"
                     v-model="stack.deploySchedule"
                     name="deploySchedule"
-                    :disabled="!stack.removeCredentials"
+                    :disabled="!stack.enableTTL"
                   >Deploy Schedule</b-form-checkbox>
                 </b-col>
                 <b-col cols="6">
@@ -200,7 +218,7 @@
                       type="text"
                       class="form-control"
                       :state="validateRegex(stack.deploySchedule, stack.deployScheduleExpression)"
-                      :disabled="!stack.removeCredentials || !stack.deploySchedule"
+                      :disabled="!stack.enableTTL || !stack.deploySchedule"
                     />
                     <!-- <b-form-invalid-feedback>Invalid cron expression syntax</b-form-invalid-feedback> -->
                   </b-form-group>
@@ -212,7 +230,7 @@
                     id="destroySchedule"
                     v-model="stack.destroySchedule"
                     name="destroySchedule"
-                    :disabled="!stack.removeCredentials"
+                    :disabled="!stack.enableTTL"
                   >Destroy Schedule</b-form-checkbox>
                 </b-col>
                 <b-col cols="6">
@@ -223,7 +241,7 @@
                       type="text"
                       class="form-control"
                       :state="validateRegex(stack.destroySchedule, stack.destroyScheduleExpression)"
-                      :disabled="!stack.removeCredentials || !stack.destroySchedule"
+                      :disabled="!stack.enableTTL || !stack.destroySchedule"
                     />
                     <!-- <b-form-invalid-feedback>Invalid cron expression syntax</b-form-invalid-feedback> -->
                   </b-form-group>
@@ -310,7 +328,7 @@
           v-if="module.mainProvider == 'GOOGLE'"
           accept=".json"
         ></b-form-file>
-        <b-form-checkbox
+        <!-- <b-form-checkbox
           id="removeCredentials"
           v-model="stack.removeCredentials"
           name="removeCredentials"
@@ -323,7 +341,7 @@
         >
           <template v-slot:title>Warning</template>
           You can't perform TTL and Scheduling operations if credentials not saved!
-        </b-popover>
+        </b-popover>-->
       </form>
     </b-modal>
   </div>

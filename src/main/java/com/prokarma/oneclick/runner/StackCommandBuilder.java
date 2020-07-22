@@ -21,6 +21,7 @@ import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.io.StringWriter;
+import java.util.Base64;
 import java.util.List;
 import java.util.function.BiFunction;
 
@@ -86,8 +87,10 @@ public class StackCommandBuilder {
         }
 
         if(OneClickConstantsI.GOOGLE_PROVIDER.equals(module.getMainProvider())) {
-            script.setGoogleCredentials(stack.getVariableValues().get(OneClickConstantsI.CRED_VAR_KEY));
+            String credentials = new String(Base64.getDecoder().decode(stack.getVariableValues().get(OneClickConstantsI.CRED_VAR_KEY)));
+            script.setGoogleCredentials(credentials);
             script.setGoogleCredentialsFilePath(OneClickConstantsI.GOOGLE_CREDENTIALS_PATH);
+            stack.getVariableValues().put(OneClickConstantsI.CRED_VAR_KEY, OneClickConstantsI.GOOGLE_CREDENTIALS_PATH);
         }
 
         script.setCommand(command.apply(stack, module));

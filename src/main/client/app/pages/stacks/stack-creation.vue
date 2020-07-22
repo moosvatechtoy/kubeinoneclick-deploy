@@ -33,7 +33,25 @@
         />
       </tab-content>
       <tab-content title="Destroy">
-        <b-form-group label="Cluster will be destroyed in">
+        <b-form-row class="margin_bottom_10">
+          <b-form-checkbox
+            id="enableTTL"
+            v-model="stack.enableTTL"
+            name="enableTTL"
+          >
+          <span id="enableTTLPop">Enable Schedule & TTL</span>
+          </b-form-checkbox>
+          <b-popover
+            target="enableTTLPop"
+            variant="danger"
+            triggers="hover focus"
+            placement="bottomright"
+          >
+            <template v-slot:title>Warning</template>
+            Your credentials will be saved to peform TTL & Scheduling once enabled..!
+          </b-popover>
+        </b-form-row>
+        <b-form-group label="Cluster will be destroyed in" v-if="stack.enableTTL">
           <b-form-row>
             <b-col cols="2">
               <b-form-radio-group
@@ -126,7 +144,7 @@
           v-if="module.mainProvider == 'GOOGLE'"
           accept=".json"
         ></b-form-file>
-        <b-form-checkbox
+        <!-- <b-form-checkbox
           id="removeCredentials"
           v-model="stack.removeCredentials"
           name="removeCredentials"
@@ -139,7 +157,7 @@
         >
           <template v-slot:title>Warning</template>
           You can't perform TTL and Scheduling operations if credentials not saved!
-        </b-popover>
+        </b-popover> -->
       </form>
     </b-modal>
   </div>
@@ -246,6 +264,13 @@ export default {
       }
     },
     async saveStack() {
+      if (!this.stack.enableTTL) {
+        this.stack.enableTTL = false;
+      }
+      if (!this.stack.destroyType) {
+        this.stack.destroyType = "T";
+        this.stack.destroyAfterHours = "-1";
+      }
       this.stackVariablesMgmt();
       return createStack(this.stack);
     },

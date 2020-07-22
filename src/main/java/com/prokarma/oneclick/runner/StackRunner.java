@@ -1,6 +1,8 @@
 package com.prokarma.oneclick.runner;
 
+import com.prokarma.oneclick.constants.OneClickConstantsI;
 import com.prokarma.oneclick.modules.bo.TerraformModule;
+import com.prokarma.oneclick.modules.bo.Variable;
 import com.prokarma.oneclick.stacks.bo.Job;
 import com.prokarma.oneclick.stacks.bo.JobType;
 import com.prokarma.oneclick.stacks.bo.Stack;
@@ -31,6 +33,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.Charset;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Consumer;
@@ -131,6 +134,9 @@ public class StackRunner {
         stepRepository.saveAll(job.getSteps());
         jobRepository.save(job);
 
+        //Set credential variables if not present for Template
+        setCredentialVariables(module);
+
         // get the wanted script
         var script = scriptFn.get();
         LOG.error("Running Stack Script===>>>" + script);
@@ -148,6 +154,32 @@ public class StackRunner {
         stepRepository.saveAll(job.getSteps());
         jobRepository.save(job);
         this.jobs.remove(job.getId());
+    }
+
+    private void setCredentialVariables(TerraformModule module) {
+        List<Variable> variableList = module.getVariables();
+        if (OneClickConstantsI.AWS_PROVIDER.equals(module.getMainProvider())) {
+            String[] variables = new String[]{ OneClickConstantsI.ACCESS_KEY_VAR_KEY, OneClickConstantsI.SECRET_VAR_KEY, OneClickConstantsI.REGION_VAR_KEY};
+            checkVariableExist(variables, variableList);
+        } else if (OneClickConstantsI.AZURE_PROVIDER.equals(module.getMainProvider())) {
+            String[] variables = new String[]{ OneClickConstantsI.SUBS_ID_VAR_KEY, OneClickConstantsI.CLIENT_ID_VAR_KEY, OneClickConstantsI.CLIENT_SECRET_VAR_KEY
+                    , OneClickConstantsI.TENANT_ID_VAR_KEY};
+            checkVariableExist(variables, variableList);
+        }  else if (OneClickConstantsI.GOOGLE_PROVIDER.equals(module.getMainProvider())) {
+            String[] variables = new String[]{ OneClickConstantsI.CRED_VAR_KEY};
+            checkVariableExist(variables, variableList);
+        }
+    }
+
+    private void checkVariableExist(String[] variables, List<Variable> variableList) {
+        for(String varKey : variables) {
+            Optional<Variable> variable = variableList.stream().filter(item -> varKey.equalsIgnoreCase(item.getName()))
+                    .findFirst();
+            if(!variable.isPresent()) {
+                variableList.add(new Variable(varKey, null, null, "",
+                        false, false, null));
+            }
+        }
     }
 
     @Async

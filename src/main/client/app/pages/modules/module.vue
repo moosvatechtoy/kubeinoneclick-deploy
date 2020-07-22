@@ -160,14 +160,6 @@
           @removeVar="removeVar"
         />
 
-        <b-form-group
-          v-if="module.mainProvider === 'GOOGLE'"
-          label="Google Service Credentials"
-          description="Google service account key in json format"
-        >
-          <b-form-textarea v-model="module.secretKey" @change="encodeCredentials()" />
-        </b-form-group>
-
         <b-button variant="success" :disabled="!formValid" @click="save">
           <font-awesome-icon icon="save" />Save
         </b-button>
