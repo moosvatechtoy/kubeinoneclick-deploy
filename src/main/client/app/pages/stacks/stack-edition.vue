@@ -70,21 +70,66 @@
                 <b-badge variant="info">{{ stack.estimatedRunningCost }} $</b-badge>
               </p>
             </div>
-            <b-form-row class="metadata" v-if="stack.enableTTL">
-              <b-col cols="3">
-                <p>
-                  Time Left :
-                  <font-awesome-icon
-                    :icon="['fa', 'edit']"
-                    class="icon edit"
-                    @click="$bvModal.show('update-destroy-time-modal')"
-                  />
-                </p>
-              </b-col>
-              <b-col cols="6">
-                <span class="time-left">{{stack.destroyAfterHours == '-1' ? 'Never' : '05:01:07'}}</span>
-              </b-col>
-            </b-form-row>
+            <div v-if="stack.enableTTL">
+              <b-form-row
+                class="metadata"
+                v-if="!stack.destroySchedule && !stack.deploySchedule && stack.destroyType == 'T'"
+              >
+                <b-col cols="3">
+                  <p>
+                    Time Left :
+                    <font-awesome-icon
+                      :icon="['fa', 'edit']"
+                      class="icon edit"
+                      @click="$bvModal.show('update-destroy-time-modal')"
+                    />
+                  </p>
+                </b-col>
+                <b-col cols="6">
+                  <span class="time-left" v-if="stack.destroyAfterHours == '-1'">Never</span>
+                  <span class="time-left" v-if="stack.destroyAfterHours !== '-1'">{{ stack.nextDestroyScheduleTime | timeDuration}}</span>
+                </b-col>
+              </b-form-row>
+              <b-form-row
+                class="metadata"
+                v-if="!stack.destroySchedule && !stack.deploySchedule && stack.destroyType == 'D'"
+              >
+                <b-col cols="3">
+                  <p>
+                    Next Schedule :
+                  </p>
+                </b-col>
+                <b-col cols="6">
+                  <span class="time-left">{{stack.nextDestroyScheduleTime | dateTime}}</span>
+                </b-col>
+              </b-form-row>
+              <b-form-row
+                class="metadata"
+                v-if="stack.destroySchedule"
+              >
+                <b-col cols="3">
+                  <p>
+                    Next Schedule :
+                  </p>
+                </b-col>
+                <b-col cols="6">
+                  <span class="time-left">{{stack.nextDestroyScheduleTime | dateTime}}</span>
+                </b-col>
+              </b-form-row>
+              <b-form-row
+                class="metadata"
+                v-if="stack.deploySchedule"
+              >
+                <b-col cols="3">
+                  <p>
+                    Next Schedule :
+                  </p>
+                </b-col>
+                <b-col cols="6">
+                  <span class="time-left">{{stack.nextDestroyScheduleTime | dateTime}}</span>
+                </b-col>
+              </b-form-row>
+            </div>
             <h2>
               <b-badge
                 v-if="stack.state === 'NEW'"
@@ -194,19 +239,22 @@
               />
             </div>
           </div>
-          <div class="block" v-if="stack.enableTTL">
+          <div class="block">
             <div class="block_head">
               <h2>Scheduling : {{stack.enableTTL ? 'ON' : 'OFF'}}</h2>
               <small>Scheduling allows you to deploy and destroy your cluster on a scheduled basis.</small>
             </div>
             <div class="block_content">
-              <div class="small">Specify cron expressions below (in UTC timezone):</div>
+              <div
+                class="small"
+              >Specify cron expressions below (in UTC timezone, ex: 0 24 23 * * ? *):</div>
               <b-form-row class="align-items-center margin_top_10 margin_bottom_10">
                 <b-col cols="4">
                   <b-form-checkbox
                     id="deploySchedule"
                     v-model="stack.deploySchedule"
                     name="deploySchedule"
+                    @change="stack.changeInTTL=true;"
                     :disabled="!stack.enableTTL"
                   >Deploy Schedule</b-form-checkbox>
                 </b-col>
@@ -217,6 +265,7 @@
                       v-model="stack.deployScheduleExpression"
                       type="text"
                       class="form-control"
+                      @change="stack.changeInTTL=true;"
                       :state="validateRegex(stack.deploySchedule, stack.deployScheduleExpression)"
                       :disabled="!stack.enableTTL || !stack.deploySchedule"
                     />
@@ -231,6 +280,7 @@
                     v-model="stack.destroySchedule"
                     name="destroySchedule"
                     :disabled="!stack.enableTTL"
+                    @change="onChangeScheduleCheck()"
                   >Destroy Schedule</b-form-checkbox>
                 </b-col>
                 <b-col cols="6">
@@ -240,6 +290,7 @@
                       v-model="stack.destroyScheduleExpression"
                       type="text"
                       class="form-control"
+                      @change="onChangeScheduleCheck()"
                       :state="validateRegex(stack.destroySchedule, stack.destroyScheduleExpression)"
                       :disabled="!stack.enableTTL || !stack.destroySchedule"
                     />
@@ -272,23 +323,34 @@
                 id="radio-group-1"
                 v-model="stack.destroyType"
                 name="destroy-options"
+                @change="stack.changeInTTL=true;"
               >
                 <b-form-radio class="destroy-after-option" value="T">Destroy after</b-form-radio>
                 <b-form-radio value="D">Specific time limit</b-form-radio>
               </b-form-radio-group>
             </b-col>
             <b-col cols="4" v-if="stack.destroyType == 'T'">
-              <b-form-select v-model="stack.destroyAfterHours" :options="destroyAfterTimeOption"></b-form-select>
+              <b-form-select
+                v-model="stack.destroyAfterHours"
+                :options="destroyAfterTimeOption"
+                @change="stack.changeInTTL=true;"
+              ></b-form-select>
             </b-col>
             <b-col cols="5" class="specific-time-limit" v-if="stack.destroyType == 'D'">
               <b-form-datepicker
                 id="destroyAfterTime-datepicker"
                 placeholder="Date"
                 v-model="stack.destroyAfterDate"
+                @change="stack.changeInTTL=true;"
               ></b-form-datepicker>
             </b-col>
             <b-col cols="3" class="specific-time-limit" v-if="stack.destroyType == 'D'">
-              <b-form-timepicker v-model="stack.destroyAfterTime" placeholder="Time" locale="en"></b-form-timepicker>
+              <b-form-timepicker
+                v-model="stack.destroyAfterTime"
+                placeholder="Time"
+                locale="en"
+                @change="stack.changeInTTL=true;"
+              ></b-form-timepicker>
             </b-col>
           </b-form-row>
         </b-form-group>
@@ -368,6 +430,7 @@ import {
 } from "@/shared/services/modal-service";
 import { getJobs } from "@/shared/api/jobs-api";
 import { CREDENTIAL_VARIABLES } from "@/shared/constants/credentials";
+import AppJobTimer from '@/pages/stacks/job/job-timer.vue';
 
 export default {
   name: "AppStackEdition",
@@ -376,7 +439,8 @@ export default {
     AppJobHistory,
     AppStackVariable,
     AppStackOutputs,
-    AppUserBadge
+    AppUserBadge,
+    AppJobTimer
   },
 
   props: {
@@ -486,12 +550,13 @@ export default {
         });
       }
       saveStack(this.stack)
-        .then(() =>
+        .then(() => {
+          this.stack.changeInTTL = false;
           displayNotification(this, {
             variant: "success",
             message: "Cluster saved."
-          })
-        )
+          });
+        })
         .catch(({ message }) => {
           displayNotification(this, {
             variant: "info",
@@ -582,6 +647,13 @@ export default {
         this.$bvModal.hide("update-credential-modal");
       });
     }
+  },
+  onChangeScheduleCheck() {
+    this.stack.changeInTTL=true;
+    if (!this.stack.deploySchedule && !this.stack.destroySchedule) {
+        this.stack.destroyType = "T";
+        this.stack.destroyAfterHours = "-1";
+      }
   }
 };
 </script>

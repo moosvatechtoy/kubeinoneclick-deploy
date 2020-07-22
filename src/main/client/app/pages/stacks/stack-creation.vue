@@ -271,6 +271,7 @@ export default {
         this.stack.destroyType = "T";
         this.stack.destroyAfterHours = "-1";
       }
+      this.stack.changeInTTL = true;
       this.stackVariablesMgmt();
       return createStack(this.stack);
     },

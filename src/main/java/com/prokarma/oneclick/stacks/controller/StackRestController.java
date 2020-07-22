@@ -10,6 +10,7 @@ import com.prokarma.oneclick.stacks.bo.Stack;
 import com.prokarma.oneclick.stacks.repository.JobRepository;
 import com.prokarma.oneclick.stacks.repository.StackRepository;
 import com.prokarma.oneclick.stacks.service.StackCostCalculator;
+import com.prokarma.oneclick.stacks.service.StackScheduleTimeCalculateUtil;
 import com.prokarma.oneclick.teams.Team;
 import com.prokarma.oneclick.teams.User;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -76,6 +77,9 @@ public class StackRestController {
         stack.setId(UUID.randomUUID().toString());
         stack.setCreatedBy(user);
         stack.setCreatedAt(LocalDateTime.now());
+        if (stack.isEnableTTL() && stack.isChangeInTTL()) {
+            StackScheduleTimeCalculateUtil.calculateScheduleTime(stack);
+        }
         return stackRepository.save(stack);
     }
 
@@ -83,6 +87,9 @@ public class StackRestController {
     public Stack update(@PathVariable String id, @RequestBody @Valid Stack stack, User user) {
         stack.setUpdatedBy(user);
         stack.setUpdatedAt(LocalDateTime.now());
+        if (stack.isEnableTTL() && stack.isChangeInTTL()) {
+            StackScheduleTimeCalculateUtil.calculateScheduleTime(stack);
+        }
         return stackRepository.save(stack);
     }
 
@@ -108,7 +115,6 @@ public class StackRestController {
         jobRepository.deleteByStackId(id);
         stackRepository.deleteById(id);
     }
-
 }
 
 @ResponseStatus(HttpStatus.NOT_FOUND)

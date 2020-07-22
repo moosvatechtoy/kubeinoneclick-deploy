@@ -81,6 +81,11 @@ public class Stack {
     private String destroyAfterDate;
     private String destroyAfterTime;
 
+    private LocalDateTime nextDeployScheduleTime;
+    private LocalDateTime nextDestroyScheduleTime;
+
+    private boolean changeInTTL;
+
     public String getId() {
         return id;
     }
@@ -255,5 +260,29 @@ public class Stack {
 
     public void setDestroyAfterTime(String destroyAfterTime) {
         this.destroyAfterTime = destroyAfterTime;
+    }
+
+    public LocalDateTime getNextDeployScheduleTime() {
+        return nextDeployScheduleTime;
+    }
+
+    public void setNextDeployScheduleTime(LocalDateTime nextDeployScheduleTime) {
+        this.nextDeployScheduleTime = nextDeployScheduleTime;
+    }
+
+    public LocalDateTime getNextDestroyScheduleTime() {
+        return nextDestroyScheduleTime;
+    }
+
+    public void setNextDestroyScheduleTime(LocalDateTime nextDestroyScheduleTime) {
+        this.nextDestroyScheduleTime = nextDestroyScheduleTime;
+    }
+
+    public boolean isChangeInTTL() {
+        return changeInTTL;
+    }
+
+    public void setChangeInTTL(boolean changeInTTL) {
+        this.changeInTTL = changeInTTL;
     }
 }
