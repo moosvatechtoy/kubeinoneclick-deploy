@@ -69,6 +69,18 @@ public class Stack {
 
     private LocalDateTime updatedAt;
 
+    private boolean removeCredentials;
+
+    //TTL & Scheduling params
+    private boolean deploySchedule;
+    private String deployScheduleExpression;
+    private boolean destroySchedule;
+    private String destroyScheduleExpression;
+    private String destroyType;
+    private String destroyAfterHours;
+    private String destroyAfterDate;
+    private String destroyAfterTime;
+
     public String getId() {
         return id;
     }
@@ -173,4 +185,75 @@ public class Stack {
         this.updatedAt = updatedAt;
     }
 
+    public boolean isRemoveCredentials() {
+        return removeCredentials;
+    }
+
+    public void setRemoveCredentials(boolean removeCredentials) {
+        this.removeCredentials = removeCredentials;
+    }
+
+    public boolean isDeploySchedule() {
+        return deploySchedule;
+    }
+
+    public void setDeploySchedule(boolean deploySchedule) {
+        this.deploySchedule = deploySchedule;
+    }
+
+    public String getDeployScheduleExpression() {
+        return deployScheduleExpression;
+    }
+
+    public void setDeployScheduleExpression(String deployScheduleExpression) {
+        this.deployScheduleExpression = deployScheduleExpression;
+    }
+
+    public boolean isDestroySchedule() {
+        return destroySchedule;
+    }
+
+    public void setDestroySchedule(boolean destroySchedule) {
+        this.destroySchedule = destroySchedule;
+    }
+
+    public String getDestroyScheduleExpression() {
+        return destroyScheduleExpression;
+    }
+
+    public void setDestroyScheduleExpression(String destroyScheduleExpression) {
+        this.destroyScheduleExpression = destroyScheduleExpression;
+    }
+
+    public String getDestroyType() {
+        return destroyType;
+    }
+
+    public void setDestroyType(String destroyType) {
+        this.destroyType = destroyType;
+    }
+
+    public String getDestroyAfterHours() {
+        return destroyAfterHours;
+    }
+
+    public void setDestroyAfterHours(String destroyAfterHours) {
+        this.destroyAfterHours = destroyAfterHours;
+    }
+
+    public String getDestroyAfterDate() {
+        return destroyAfterDate;
+    }
+
+    public void setDestroyAfterDate(String destroyAfterDate) {
+        this.destroyAfterDate = destroyAfterDate;
+    }
+
+    public String getDestroyAfterTime() {
+        return destroyAfterTime;
+    }
+
+    public void setDestroyAfterTime(String destroyAfterTime) {
+        this.destroyAfterTime = destroyAfterTime;
+    }
 }

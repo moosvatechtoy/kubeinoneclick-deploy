@@ -15,6 +15,8 @@ public class TerraformScript {
     private String command;
     private String stateApiUser;
     private String stateApiPassword;
+    private String googleCredentials;
+    private String googleCredentialsFilePath;
 
     public String getTerraformImage() {
         return terraformImage;
@@ -103,5 +105,21 @@ public class TerraformScript {
     public TerraformScript setStateApiPassword(String stateApiPassword) {
         this.stateApiPassword = stateApiPassword;
         return this;
+    }
+
+    public String getGoogleCredentials() {
+        return googleCredentials;
+    }
+
+    public void setGoogleCredentials(String googleCredentials) {
+        this.googleCredentials = googleCredentials;
+    }
+
+    public String getGoogleCredentialsFilePath() {
+        return googleCredentialsFilePath;
+    }
+
+    public void setGoogleCredentialsFilePath(String googleCredentialsFilePath) {
+        this.googleCredentialsFilePath = googleCredentialsFilePath;
     }
 }

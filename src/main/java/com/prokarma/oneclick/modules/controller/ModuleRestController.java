@@ -1,5 +1,6 @@
 package com.prokarma.oneclick.modules.controller;
 
+import com.prokarma.oneclick.constants.OneClickConstantsI;
 import com.prokarma.oneclick.modules.bo.Variable;
 import com.prokarma.oneclick.modules.repository.TerraformModuleGitRepository;
 import com.prokarma.oneclick.modules.repository.TerraformModuleRepository;
@@ -82,8 +83,7 @@ public class ModuleRestController {
         module.setId(UUID.randomUUID().toString());
         module.getModuleMetadata().setCreatedBy(user);
         if (GOOGLE_PROVIDER.equalsIgnoreCase(module.getMainProvider())) {
-            String credentialsFile = ModuleUtil.addSecretFile(module, credentialsLocation);
-            Variable variable =new Variable(CRED_VAR_KEY, null, null, credentialsFile,
+            Variable variable =new Variable(CRED_VAR_KEY, null, null, OneClickConstantsI.GOOGLE_CREDENTIALS_PATH,
                     false, false, null);
             module.getVariables().add(variable);
         }

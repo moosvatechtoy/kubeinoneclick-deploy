@@ -1,6 +1,7 @@
 package com.prokarma.oneclick.runner;
 
 import com.github.mustachejava.Mustache;
+import com.prokarma.oneclick.constants.OneClickConstantsI;
 import com.prokarma.oneclick.modules.bo.TerraformModule;
 import com.prokarma.oneclick.registries.RegistryOAuth2Provider;
 import com.prokarma.oneclick.settings.bo.Settings;
@@ -82,6 +83,11 @@ public class StackCommandBuilder {
             script.setGitBranch(module.getGitBranch());
         } else {
             script.setLocalDirectory(module.getLocalCodeLocation());
+        }
+
+        if(OneClickConstantsI.GOOGLE_PROVIDER.equals(module.getMainProvider())) {
+            script.setGoogleCredentials(stack.getVariableValues().get(OneClickConstantsI.CRED_VAR_KEY));
+            script.setGoogleCredentialsFilePath(OneClickConstantsI.GOOGLE_CREDENTIALS_PATH);
         }
 
         script.setCommand(command.apply(stack, module));

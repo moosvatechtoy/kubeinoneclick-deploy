@@ -20,6 +20,11 @@ cd {{localDirectory}}
     cd {{gitDirectory}}
 {{/gitDirectory}}
 
+{{#googleCredentials}}
+echo 'generating google credentials'
+echo '{{googleCredentials}}' > {{googleCredentialsFilePath}}
+{{/googleCredentials}}
+
 echo 'generating backend configuration'
 echo 'terraform {
     backend "http" {
