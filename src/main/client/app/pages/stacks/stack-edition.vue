@@ -50,7 +50,7 @@
                 >{{ module.name }}</router-link>
               </p>
             </div>
-            <b-form-row class="metadata">
+            <b-form-row class="metadata" v-if="!stack.removeCredentials">
               <b-col cols="3">
                 <p>
                   Time Left :
@@ -189,6 +189,7 @@
                     id="deploySchedule"
                     v-model="stack.deploySchedule"
                     name="deploySchedule"
+                    :disabled="!stack.removeCredentials"
                   >Deploy Schedule</b-form-checkbox>
                 </b-col>
                 <b-col cols="6">
@@ -199,7 +200,7 @@
                       type="text"
                       class="form-control"
                       :state="validateRegex(stack.deploySchedule, stack.deployScheduleExpression)"
-                      :disabled="!stack.deploySchedule"
+                      :disabled="!stack.removeCredentials || !stack.deploySchedule"
                     />
                     <!-- <b-form-invalid-feedback>Invalid cron expression syntax</b-form-invalid-feedback> -->
                   </b-form-group>
@@ -211,6 +212,7 @@
                     id="destroySchedule"
                     v-model="stack.destroySchedule"
                     name="destroySchedule"
+                    :disabled="!stack.removeCredentials"
                   >Destroy Schedule</b-form-checkbox>
                 </b-col>
                 <b-col cols="6">
@@ -221,7 +223,7 @@
                       type="text"
                       class="form-control"
                       :state="validateRegex(stack.destroySchedule, stack.destroyScheduleExpression)"
-                      :disabled="!stack.destroySchedule"
+                      :disabled="!stack.removeCredentials || !stack.destroySchedule"
                     />
                     <!-- <b-form-invalid-feedback>Invalid cron expression syntax</b-form-invalid-feedback> -->
                   </b-form-group>
@@ -308,6 +310,20 @@
           v-if="module.mainProvider == 'GOOGLE'"
           accept=".json"
         ></b-form-file>
+        <b-form-checkbox
+          id="removeCredentials"
+          v-model="stack.removeCredentials"
+          name="removeCredentials"
+        >Remove Credentials after deploy</b-form-checkbox>
+        <b-popover
+          target="removeCredentials"
+          variant="danger"
+          triggers="hover focus"
+          placement="bottomright"
+        >
+          <template v-slot:title>Warning</template>
+          You can't perform TTL and Scheduling operations if credentials not saved!
+        </b-popover>
       </form>
     </b-modal>
   </div>
@@ -376,8 +392,11 @@ export default {
       fileReader.onload = e => {
         console.log(e.target.result);
         this.googleCredentialValue = e.target.result.substr(29);
-        console.log(this.googleCredentialValue && this.googleCredentialValue.length > 0);
-        this.credentialsFormValid = this.googleCredentialValue && this.googleCredentialValue.length > 0;
+        console.log(
+          this.googleCredentialValue && this.googleCredentialValue.length > 0
+        );
+        this.credentialsFormValid =
+          this.googleCredentialValue && this.googleCredentialValue.length > 0;
       };
       fileReader.readAsDataURL(val);
     }
@@ -524,11 +543,11 @@ export default {
 
     handleCredentialsOk(bvModalEvt) {
       bvModalEvt.preventDefault();
-      if (this.module.mainProvider == 'GOOGLE') {
+      if (this.module.mainProvider == "GOOGLE") {
         this.credentialVariables.push({
-            name: 'credentials',
-            value: this.googleCredentialValue,
-            isValid: true
+          name: "credentials",
+          value: this.googleCredentialValue,
+          isValid: true
         });
       }
       let invalidItems = this.credentialVariables.filter(item => !item.isValid);

@@ -50,7 +50,8 @@
               <b-form-select v-model="stack.destroyAfterHours" :options="destroyAfterTimeOption"></b-form-select>
             </b-col>
             <b-col cols="3" class="specific-time-limit">
-              <b-form-datepicker  v-if="stack.destroyType == 'D'"
+              <b-form-datepicker
+                v-if="stack.destroyType == 'D'"
                 id="destroyAfterTime-datepicker"
                 placeholder="Date"
                 v-model="stack.destroyAfterDate"
@@ -91,6 +92,56 @@
         </wizard-button>
       </template>
     </form-wizard>
+
+    <b-modal
+      id="update-credential-modal"
+      ref="modal"
+      title="Credentials"
+      okVariant="success"
+      button-size="sm"
+      :ok-disabled="Boolean(!credentialsFormValid)"
+      @ok="handleCredentialsOk"
+    >
+      <form ref="form" @submit.stop.prevent="handleCredentialsSubmit">
+        <div
+          v-if="module.mainProvider != 'GOOGLE' && credentialVariables"
+          class="block-content-modal"
+        >
+          <app-stack-variable
+            v-for="variable in credentialVariables"
+            :key="variable.name"
+            :name="variable.name"
+            :description="variable.description"
+            :value="variable.value"
+            :validationRegex="variable.validationRegex"
+            :mandatory="variable.mandatory"
+            v-model="variable.value"
+            @valid="(isValid) => variable.isValid = isValid"
+          />
+        </div>
+        <b-form-file
+          v-model="googleCredentials"
+          :state="Boolean(googleCredentials)"
+          placeholder="Google Service Credentials"
+          v-if="module.mainProvider == 'GOOGLE'"
+          accept=".json"
+        ></b-form-file>
+        <b-form-checkbox
+          id="removeCredentials"
+          v-model="stack.removeCredentials"
+          name="removeCredentials"
+        >Remove Credentials after deploy</b-form-checkbox>
+        <b-popover
+          target="removeCredentials"
+          variant="danger"
+          triggers="hover focus"
+          placement="bottomright"
+        >
+          <template v-slot:title>Warning</template>
+          You can't perform TTL and Scheduling operations if credentials not saved!
+        </b-popover>
+      </form>
+    </b-modal>
   </div>
 </template>
 
@@ -99,6 +150,7 @@ import { getModule } from "@/shared/api/modules-api";
 import { createStack, runStack } from "@/shared/api/stacks-api";
 
 import AppStackVariable from "./stack-variable.vue";
+import { CREDENTIAL_VARIABLES } from "@/shared/constants/credentials";
 
 export default {
   name: "AppStackCreation",
@@ -119,13 +171,34 @@ export default {
       module: null,
       stack: null,
       stacksVariablesValidated: false,
+      credentialVariables: [],
       destroyAfterTimeOption: [
         { text: "8 Hours", value: "8" },
         { text: "12 Hours", value: "12" },
         { text: "24 Hours", value: "24" },
         { text: "Never", value: "-1" }
-      ]
+      ],
+      googleCredentials: null,
+      googleCredentialValue: null,
+      credentialsFormValid: false
     };
+  },
+
+  watch: {
+    googleCredentials(val) {
+      if (!val) return;
+      const fileReader = new FileReader();
+      fileReader.onload = e => {
+        console.log(e.target.result);
+        this.googleCredentialValue = e.target.result.substr(29);
+        console.log(
+          this.googleCredentialValue && this.googleCredentialValue.length > 0
+        );
+        this.credentialsFormValid =
+          this.googleCredentialValue && this.googleCredentialValue.length > 0;
+      };
+      fileReader.readAsDataURL(val);
+    }
   },
 
   computed: {
@@ -140,7 +213,7 @@ export default {
     this.stack = {};
     this.stack.moduleId = this.module.id;
     this.stack.variableValues = {};
-    this.stack.destroyAfterHours = '-1';
+    this.stack.destroyAfterHours = "-1";
     let variables = this.module.variables.filter(
       item => item.name !== "credentials"
     );
@@ -166,18 +239,10 @@ export default {
       this.stack.variables.forEach(variable => {
         this.stack.variableValues[variable.name] = variable.value;
       });
-      let credentialVariables = this.module.variables.filter(
-        item => item.name === "credentials"
-      );
-      if (credentialVariables && credentialVariables.length > 0) {
-        let variable = {
-          ...credentialVariables[0],
-          value: credentialVariables[0].defaultValue,
-          isValid: true
-        };
-        this.stack.variables.push(variable);
-        this.stack.variableValues["credentials"] =
-          credentialVariables[0].defaultValue;
+      if (this.credentialVariables && this.credentialVariables.length > 0) {
+        this.credentialVariables.forEach(variable => {
+          this.stack.variableValues[variable.name] = variable.value;
+        });
       }
     },
     async saveStack() {
@@ -189,9 +254,48 @@ export default {
       this.$router.push({ name: "stack_edition", params: { stackId } });
     },
     async saveAndRun() {
+      if (this.module.mainProvider == "ONPREM") {
+        const { id: stackId } = await this.saveStack();
+        const { jobId } = await runStack(stackId);
+        this.$router.push({ name: "job", params: { stackId, jobId } });
+      } else {
+        if (this.module.mainProvider == "AWS") {
+          this.credentialVariables = Object.assign(
+            [],
+            CREDENTIAL_VARIABLES.AWS
+          );
+          this.credentialsFormValid = true;
+        } else if (this.module.mainProvider == "AZURE") {
+          this.credentialVariables = Object.assign(
+            [],
+            CREDENTIAL_VARIABLES.AZURE
+          );
+          this.credentialsFormValid = true;
+        }
+        this.$bvModal.show("update-credential-modal");
+      }
+    },
+    handleCredentialsOk(bvModalEvt) {
+      bvModalEvt.preventDefault();
+      if (this.module.mainProvider == "GOOGLE") {
+        this.credentialVariables.push({
+          name: "credentials",
+          value: this.googleCredentialValue,
+          isValid: true
+        });
+      }
+      let invalidItems = this.credentialVariables.filter(item => !item.isValid);
+      if (invalidItems.length == 0) {
+        this.handleCredentialsSubmit();
+      }
+    },
+    async handleCredentialsSubmit() {
       const { id: stackId } = await this.saveStack();
       const { jobId } = await runStack(stackId);
       this.$router.push({ name: "job", params: { stackId, jobId } });
+      this.$nextTick(() => {
+        this.$bvModal.hide("update-credential-modal");
+      });
     }
   }
 };

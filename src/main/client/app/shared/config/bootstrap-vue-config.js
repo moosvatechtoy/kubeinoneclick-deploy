@@ -25,7 +25,8 @@ import {
   BFormTimepicker,
   BFormDatepicker,
   FormSelectPlugin,
-  FormFilePlugin 
+  FormFilePlugin,
+  PopoverPlugin  
 } from 'bootstrap-vue';
 
 export default {
@@ -56,5 +57,6 @@ export default {
     Vue.component('b-form-datepicker', BFormDatepicker);
     Vue.use(FormSelectPlugin);
     Vue.use(FormFilePlugin);
+    Vue.use(PopoverPlugin);
   },
 };
