@@ -18,6 +18,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.text.ParseException;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
@@ -72,7 +73,7 @@ public class StackRestController {
     }
 
     @PostMapping
-    public Stack save(@RequestBody @Valid Stack stack, Team userTeam, User user) {
+    public Stack save(@RequestBody @Valid Stack stack, Team userTeam, User user) throws ParseException {
         stack.setOwnerTeam(userTeam);
         stack.setId(UUID.randomUUID().toString());
         stack.setCreatedBy(user);
@@ -84,7 +85,7 @@ public class StackRestController {
     }
 
     @PutMapping("/{id}")
-    public Stack update(@PathVariable String id, @RequestBody @Valid Stack stack, User user) {
+    public Stack update(@PathVariable String id, @RequestBody @Valid Stack stack, User user) throws ParseException {
         stack.setUpdatedBy(user);
         stack.setUpdatedAt(LocalDateTime.now());
         if (stack.isEnableTTL() && stack.isChangeInTTL()) {
