@@ -17,6 +17,8 @@ public class TerraformScript {
     private String stateApiPassword;
     private String googleCredentials;
     private String googleCredentialsFilePath;
+    private String awsAccessKeyId;
+    private String awsSecretAccessKey;
 
     public String getTerraformImage() {
         return terraformImage;
@@ -121,5 +123,21 @@ public class TerraformScript {
 
     public void setGoogleCredentialsFilePath(String googleCredentialsFilePath) {
         this.googleCredentialsFilePath = googleCredentialsFilePath;
+    }
+
+    public String getAwsAccessKeyId() {
+        return awsAccessKeyId;
+    }
+
+    public void setAwsAccessKeyId(String awsAccessKeyId) {
+        this.awsAccessKeyId = awsAccessKeyId;
+    }
+
+    public String getAwsSecretAccessKey() {
+        return awsSecretAccessKey;
+    }
+
+    public void setAwsSecretAccessKey(String awsSecretAccessKey) {
+        this.awsSecretAccessKey = awsSecretAccessKey;
     }
 }

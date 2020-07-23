@@ -93,6 +93,11 @@ public class StackCommandBuilder {
             stack.getVariableValues().put(OneClickConstantsI.CRED_VAR_KEY, OneClickConstantsI.GOOGLE_CREDENTIALS_PATH);
         }
 
+        if(OneClickConstantsI.AWS_PROVIDER.equals(module.getMainProvider())) {
+            script.setAwsAccessKeyId(stack.getVariableValues().get(OneClickConstantsI.ACCESS_KEY_VAR_KEY));
+            script.setAwsSecretAccessKey(stack.getVariableValues().get(OneClickConstantsI.SECRET_VAR_KEY));
+        }
+
         script.setCommand(command.apply(stack, module));
 
         var writer = new StringWriter();

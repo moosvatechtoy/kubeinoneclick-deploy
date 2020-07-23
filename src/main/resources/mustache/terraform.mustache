@@ -26,6 +26,15 @@ echo '{{googleCredentials}}' > {{googleCredentialsFilePath}}
 cat {{googleCredentialsFilePath}}
 {{/googleCredentials}}
 
+{{#awsAccessKeyId}}
+echo 'generating aws credentials'
+mkdir /root/.aws
+echo '[default]
+aws_access_key_id={{awsAccessKeyId}}
+aws_secret_access_key={{awsSecretAccessKey}}' > /root/.aws/credentials
+cat /root/.aws/credentials
+{{/awsAccessKeyId}}
+
 echo 'generating backend configuration'
 echo 'terraform {
     backend "http" {
