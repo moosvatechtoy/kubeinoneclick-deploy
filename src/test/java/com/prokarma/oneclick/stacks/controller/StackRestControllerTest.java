@@ -18,6 +18,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.text.ParseException;
 import java.time.LocalDateTime;
 import java.util.Optional;
 
@@ -146,7 +147,7 @@ class StackRestControllerTest {
     }
 
     @Test
-    void save_shouldSaveStack() {
+    void save_shouldSaveStack() throws ParseException {
         // when
         stackRestController.save(stack, userTeam, standardUser);
 
@@ -159,7 +160,7 @@ class StackRestControllerTest {
     }
 
     @Test
-    void update_shouldSaveStack() {
+    void update_shouldSaveStack() throws ParseException {
         // when
         stackRestController.update("12", stack, standardUser);
 
