@@ -59,8 +59,8 @@
           <div>
             <span class="job_attr_icon"><font-awesome-icon icon="stopwatch" /></span>
             <app-job-timer
-              :start-time="job.startDateTime"
-              :end-time="job.endDateTime"
+              :start-time="job.startDateTime | dateTime"
+              :end-time="job.endDateTime | dateTime"
               :css-class="'job_attr_value'"
             />
           </div>
