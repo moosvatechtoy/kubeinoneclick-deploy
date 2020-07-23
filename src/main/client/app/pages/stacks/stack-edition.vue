@@ -87,7 +87,10 @@
                 </b-col>
                 <b-col cols="6">
                   <span class="time-left" v-if="stack.destroyAfterHours == '-1'">Never</span>
-                  <span class="time-left" v-if="stack.destroyAfterHours !== '-1'">{{ stack.nextDestroyScheduleTime | timeDuration}}</span>
+                  <span
+                    class="time-left"
+                    v-if="stack.destroyAfterHours !== '-1'"
+                  >{{ stack.nextDestroyScheduleTime | timeDuration}}</span>
                 </b-col>
               </b-form-row>
               <b-form-row
@@ -95,50 +98,58 @@
                 v-if="!stack.destroySchedule && !stack.deploySchedule && stack.destroyType == 'D'"
               >
                 <b-col cols="3">
-                  <p>
-                    Next Schedule :
-                  </p>
+                  <p>Next Schedule :</p>
                 </b-col>
                 <b-col cols="6">
-                  <span class="time-left">{{stack.nextDestroyScheduleTime | dateTime}} </span>
+                  <span class="time-left">{{stack.nextDestroyScheduleTime | dateTime}}</span>
                   <font-awesome-icon
-                      :icon="['fa', 'rocket']"
-                      class="icon warning"
-                    />
+                    :icon="['fa', 'rocket']"
+                    class="icon warning"
+                    id="nextDestroyScheduleTime1"
+                  />
+                  <b-tooltip
+                    target="nextDestroyScheduleTime1"
+                    placement="bottom"
+                    variant="danger"
+                    triggers="hover"
+                  >Time till next Deploy</b-tooltip>
                 </b-col>
               </b-form-row>
-              <b-form-row
-                class="metadata"
-                v-if="stack.destroySchedule"
-              >
+              <b-form-row class="metadata" v-if="stack.destroySchedule">
                 <b-col cols="3">
-                  <p>
-                    Next Schedule :
-                  </p>
+                  <p>Next Schedule :</p>
                 </b-col>
                 <b-col cols="6">
-                  <span class="time-left">{{stack.nextDestroyScheduleTime | dateTime}} </span>
+                  <span class="time-left">{{stack.nextDestroyScheduleTime | dateTime}}</span>
                   <font-awesome-icon
-                      :icon="['fa', 'rocket']"
-                      class="icon warning"
-                    />
+                    :icon="['fa', 'rocket']"
+                    class="icon warning"
+                    id="nextDestroyScheduleTime"
+                  />
+                  <b-tooltip
+                    target="nextDestroyScheduleTime"
+                    placement="bottom"
+                    variant="danger"
+                    triggers="hover"
+                  >Time till next Destroy</b-tooltip>
                 </b-col>
               </b-form-row>
-              <b-form-row
-                class="metadata"
-                v-if="stack.deploySchedule"
-              >
+              <b-form-row class="metadata" v-if="stack.deploySchedule">
                 <b-col cols="3">
-                  <p>
-                    Next Schedule :
-                  </p>
+                  <p>Next Schedule :</p>
                 </b-col>
                 <b-col cols="6">
-                  <span class="time-left">{{stack.nextDeployScheduleTime | dateTime}} </span>
+                  <span class="time-left">{{stack.nextDeployScheduleTime | dateTime}}</span>
                   <font-awesome-icon
-                      :icon="['fa', 'rocket']"
-                      class="icon edit"
-                    />
+                    :icon="['fa', 'rocket']"
+                    class="icon edit"
+                    id="nextDeployScheduleTime"
+                  />
+                  <b-tooltip
+                    target="nextDeployScheduleTime"
+                    placement="bottom"
+                    triggers="hover"
+                  >Time till next Deploy</b-tooltip>
                 </b-col>
               </b-form-row>
             </div>
@@ -253,7 +264,7 @@
           </div>
           <div class="block">
             <div class="block_head">
-              <h2>Scheduling : {{stack.enableTTL ? 'ON' : 'OFF'}}</h2>
+              <h2>Scheduling : <span :class="(stack.deploySchedule || stack.destroySchedule) ? 'scheduling-on' : 'scheduling-off'">{{stack.deploySchedule || stack.destroySchedule ? 'ON' : 'OFF'}} </span></h2>
               <small>Scheduling allows you to deploy and destroy your cluster on a scheduled basis.</small>
             </div>
             <div class="block_content">
@@ -292,7 +303,7 @@
                     v-model="stack.destroySchedule"
                     name="destroySchedule"
                     :disabled="!stack.enableTTL"
-                    @change="onChangeScheduleCheck()"
+                    @change="onChangeScheduleCheck"
                   >Destroy Schedule</b-form-checkbox>
                 </b-col>
                 <b-col cols="6">
@@ -302,7 +313,7 @@
                       v-model="stack.destroyScheduleExpression"
                       type="text"
                       class="form-control"
-                      @change="onChangeScheduleCheck()"
+                      @change="onChangeScheduleCheck"
                       :state="validateRegex(stack.destroySchedule, stack.destroyScheduleExpression)"
                       :disabled="!stack.enableTTL || !stack.destroySchedule"
                     />
@@ -442,7 +453,7 @@ import {
 } from "@/shared/services/modal-service";
 import { getJobs } from "@/shared/api/jobs-api";
 import { CREDENTIAL_VARIABLES } from "@/shared/constants/credentials";
-import AppJobTimer from '@/pages/stacks/job/job-timer.vue';
+import AppJobTimer from "@/pages/stacks/job/job-timer.vue";
 
 export default {
   name: "AppStackEdition",
@@ -476,7 +487,8 @@ export default {
     ],
     googleCredentials: null,
     googleCredentialValue: null,
-    credentialsFormValid: false
+    credentialsFormValid: false,
+    schedlingBefore: null
   }),
 
   watch: {
@@ -510,6 +522,10 @@ export default {
 
   async created() {
     const stack = await getStack(this.stackId);
+    this.schedlingBefore = {
+      deploySchedule: stack.deploySchedule,
+      destroySchedule: stack.destroySchedule
+    };
     this.module = await getModule(stack.moduleId);
     try {
       this.state = await getState(this.stackId);
@@ -551,7 +567,36 @@ export default {
     moduleVar(name) {
       return this.module.variables.find(variable => variable.name === name);
     },
-    saveStack() {
+    async saveStack() {
+      let beforeScheduling =
+        this.schedlingBefore.deploySchedule ||
+        this.schedlingBefore.destroySchedule;
+      let currentScheduling =
+        this.stack.deploySchedule || this.stack.destroySchedule;
+      let enableScheduling = !beforeScheduling && currentScheduling;
+      let disableScheduling = beforeScheduling && !currentScheduling;
+      console.log(enableScheduling, disableScheduling);
+      if (enableScheduling || disableScheduling) {
+        let message = enableScheduling
+          ? "You're about to enable scheduling for this environment. This will override the current TTL settings."
+          : "You're about to disable scheduling for this environment. This will override the current TTL settings.";
+        if (
+          await displayConfirmDialog(this, {
+            title: "Update Scheduling",
+            message
+          })
+        ) {
+          this.processSaveStack();
+        }
+      } else {
+        this.processSaveStack();
+      }
+    },
+    processSaveStack() {
+      if (!this.stack.destroyType) {
+        this.stack.destroyType = "T";
+        this.stack.destroyAfterHours = "-1";
+      }
       this.stack.variableValues = {};
       this.stack.variables.forEach(variable => {
         this.stack.variableValues[variable.name] = variable.value;
@@ -562,8 +607,19 @@ export default {
         });
       }
       saveStack(this.stack)
-        .then(() => {
+        .then(async () => {
           this.stack.changeInTTL = false;
+          let stack = await getStack(this.stack.id);
+          stack.variables = this.module.variables.map(variable => ({
+            ...variable,
+            value: stack.variableValues[variable.name],
+            isValid: true
+          }));
+          this.schedlingBefore = {
+            deploySchedule: stack.deploySchedule,
+            destroySchedule: stack.destroySchedule
+          };
+          this.stack = stack;
           displayNotification(this, {
             variant: "success",
             message: "Cluster saved."
@@ -658,14 +714,14 @@ export default {
       this.$nextTick(() => {
         this.$bvModal.hide("update-credential-modal");
       });
-    }
-  },
-  onChangeScheduleCheck() {
-    this.stack.changeInTTL=true;
-    if (!this.stack.deploySchedule && !this.stack.destroySchedule) {
+    },
+    onChangeScheduleCheck() {
+      this.stack.changeInTTL = true;
+      if (!this.stack.deploySchedule && !this.stack.destroySchedule) {
         this.stack.destroyType = "T";
         this.stack.destroyAfterHours = "-1";
       }
+    }
   }
 };
 </script>
@@ -682,6 +738,15 @@ export default {
 }
 
 .warning {
+  color: #bd2130;
+  cursor: pointer;
+}
+
+.scheduling-on {
+  color: #3273dc;
+}
+
+.scheduling-off {
   color: #bd2130;
 }
 
