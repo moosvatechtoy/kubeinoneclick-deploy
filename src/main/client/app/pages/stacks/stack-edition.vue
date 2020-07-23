@@ -100,7 +100,7 @@
                   </p>
                 </b-col>
                 <b-col cols="6">
-                  <span class="time-left">{{stack.nextDestroyScheduleTime | dateTime}}</span>
+                  <span class="time-left">{{stack.nextDestroyScheduleTime | dateTime}} </span>
                   <font-awesome-icon
                       :icon="['fa', 'rocket']"
                       class="icon warning"
@@ -117,7 +117,7 @@
                   </p>
                 </b-col>
                 <b-col cols="6">
-                  <span class="time-left">{{stack.nextDestroyScheduleTime | dateTime}}</span>
+                  <span class="time-left">{{stack.nextDestroyScheduleTime | dateTime}} </span>
                   <font-awesome-icon
                       :icon="['fa', 'rocket']"
                       class="icon warning"

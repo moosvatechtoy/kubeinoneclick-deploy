@@ -18,7 +18,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.text.ParseException;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
+import java.util.Date;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
@@ -42,31 +46,42 @@ public class SchedulerJob implements Job {
         LOG.warn("Scheduler Job process started..");
         List<Stack> stackList = stackRepository.findAll();
         stackList.forEach(stack -> {
-            CompletableFuture.runAsync(() -> processScheduling(stack));
+            CompletableFuture.runAsync(() -> {
+                try {
+                    processScheduling(stack);
+                } catch (ParseException e) {
+                    LOG.error("Scheduler Job process failed for stack==>" + stack.getId(), e);
+                    e.printStackTrace();
+                }
+            });
         });
         LOG.warn("Scheduler Job process completed..!!");
     }
 
-    private void processScheduling(Stack stack) {
+    private void processScheduling(Stack stack) throws ParseException {
         if(stack.isEnableTTL() && !stack.isSchedulingTriggered()) {
             stack.setSchedulingTriggered(true);
             stackRepository.save(stack);
+            LocalDateTime  timeNow = LocalDateTime.ofInstant(new Date().toInstant(),
+                    ZoneId.of("UTC", ZoneId.SHORT_IDS));
             if (stack.isDeploySchedule() && stack.isDestroySchedule()) {
                 if(stack.getNextDeployScheduleTime().isBefore(stack.getNextDestroyScheduleTime()) &&
-                        stack.getNextDeployScheduleTime().isBefore(LocalDateTime.now())) {
+                        stack.getNextDeployScheduleTime().isBefore(timeNow)) {
                     deployStack(stack, JobType.DESTROY);
                     deployStack(stack, JobType.RUN);
-                } else if (stack.getNextDestroyScheduleTime().isBefore(LocalDateTime.now())) {
+                } else if (stack.getNextDestroyScheduleTime().isBefore(timeNow)) {
                     deployStack(stack, JobType.DESTROY);
                 }
-            } else if(stack.isDeploySchedule() && stack.getNextDeployScheduleTime().isBefore(LocalDateTime.now())) {
+                StackScheduleTimeCalculateUtil.calculateScheduleTime(stack);
+            } else if(stack.isDeploySchedule() && stack.getNextDeployScheduleTime().isBefore(timeNow)) {
                 deployStack(stack, JobType.DESTROY);
                 deployStack(stack, JobType.RUN);
+                StackScheduleTimeCalculateUtil.calculateScheduleTime(stack);
             } else if ((stack.isDestroySchedule() || (null != stack.getDestroyType() && !OneClickConstantsI.DESTROY_NEVER.equalsIgnoreCase(stack.getDestroyAfterHours())))
                     && stack.getNextDestroyScheduleTime().isBefore(LocalDateTime.now())) {
                 deployStack(stack, JobType.DESTROY);
+                StackScheduleTimeCalculateUtil.calculateScheduleTime(stack);
             }
-            StackScheduleTimeCalculateUtil.calculateScheduleTime(stack);
             stack.setSchedulingTriggered(false);
             stackRepository.save(stack);
         }
