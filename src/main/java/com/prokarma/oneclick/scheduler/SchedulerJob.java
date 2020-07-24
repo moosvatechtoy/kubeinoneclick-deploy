@@ -10,8 +10,6 @@ import com.prokarma.oneclick.stacks.repository.JobRepository;
 import com.prokarma.oneclick.stacks.repository.StackRepository;
 import com.prokarma.oneclick.stacks.service.StackScheduleTimeCalculateUtil;
 import com.prokarma.oneclick.stacks.workflow.JobWorkflow;
-import com.prokarma.oneclick.teams.Team;
-import com.prokarma.oneclick.teams.User;
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.slf4j.Logger;
@@ -21,7 +19,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.text.ParseException;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.time.ZoneOffset;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -97,11 +94,21 @@ public class SchedulerJob implements Job {
         job.setTerraformImage(module.getTerraformImage());
         jobRepository.save(job);
         LOG.warn("Created Job:", job.getId());
+
         LOG.warn("Plan Started for job =>", job.getId());
+        job = jobRepository.findById(job.getId()).orElseThrow();
+        stack = this.stackRepository.findById(stack.getId()).orElseThrow();
         stackRunner.plan(new JobWorkflow(job), module, stack);
+        jobRepository.save(job);
+        stackRepository.save(stack);
         LOG.warn("Plan Completed for job =>", job.getId());
+
         LOG.warn("Apply Started for job =>", job.getId());
+        job = jobRepository.findById(job.getId()).orElseThrow();
+        stack = this.stackRepository.findById(stack.getId()).orElseThrow();
         stackRunner.apply(new JobWorkflow(job), module, stack);
+        jobRepository.save(job);
+        stackRepository.save(stack);
         LOG.warn("Apply Completed for job =>", job.getId());
     }
 }
